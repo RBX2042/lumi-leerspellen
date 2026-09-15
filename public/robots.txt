@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /ouders
+Disallow: /spelen
+Disallow: /afrekenen
+Disallow: /login
+Disallow: /groei

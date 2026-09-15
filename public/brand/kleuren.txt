@@ -1,0 +1,15 @@
+Lumi kleuren
+============
+Terracotta  #C45C38   accent — knoppen, icoon, één pigment
+Inkt        #1C1915   tekst en donkere vlakken
+Papier      #F6F1E8   achtergrond, als een blad
+Porselein   #FFFCF8   kaarten en velden
+
+Chrome is papier + inkt. Terracotta alleen voor actie en het merkteken.
+Nooit het hele scherm vol terracotta. Nooit bosgroen. Nooit paars, nooit goud.
+
+Spellen mogen een stille toon dragen:
+Rekenen  #C45C38
+Taal     #3E5872
+Denken   #6A5A48
+Wereld   #4A5668

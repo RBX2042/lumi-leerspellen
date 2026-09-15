@@ -1,0 +1,16 @@
+node_modules
+.output
+.vinxi
+.tanstack
+.vercel
+.grok
+.nitro
+dist
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+screenshots
+artifacts
+src/lib/baked-env.local.server.ts
