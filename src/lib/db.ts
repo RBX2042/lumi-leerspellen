@@ -1,5 +1,5 @@
 import { pendingMigrations } from "../../scripts/migration-plan.mjs";
-import { bakedDatabaseUrl } from "./baked-env.server";
+import { bakedAuthSecret, bakedDatabaseUrl } from "./baked-env.server";
 
 /** Which database backend is active. */
 export type DbSource = "neon" | "pglite";
@@ -11,6 +11,17 @@ const rawDatabaseUrl =
   bakedDatabaseUrl;
 const databaseUrl =
   rawDatabaseUrl && rawDatabaseUrl.trim() ? rawDatabaseUrl : undefined;
+
+// File-deployed Vercel builds bake secrets into this module (project env is
+// often unset). Hydrate process.env *before* Better Auth reads DATABASE_URL.
+if (typeof process !== "undefined") {
+  if (databaseUrl && !process.env.DATABASE_URL?.trim()) {
+    process.env.DATABASE_URL = databaseUrl;
+  }
+  if (bakedAuthSecret && !process.env.BETTER_AUTH_SECRET?.trim()) {
+    process.env.BETTER_AUTH_SECRET = bakedAuthSecret;
+  }
+}
 
 
 /**
