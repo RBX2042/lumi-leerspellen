@@ -13,28 +13,28 @@ export function SiteHeader({ dim = false }: { dim?: boolean }) {
     <header
       className={
         dim
-          ? "sticky top-0 z-30 border-b border-border bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur-sm"
-          : "sticky top-0 z-30 border-b border-border bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur-sm"
+          ? "sticky top-0 z-30 border-b border-border/80 bg-bg/75 pt-[env(safe-area-inset-top)] backdrop-blur-xl"
+          : "sticky top-0 z-30 border-b border-border/80 bg-bg/75 pt-[env(safe-area-inset-top)] backdrop-blur-xl"
       }
     >
-      <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4">
+      <div className="mx-auto flex h-[4.35rem] max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4">
         <Link to="/" className="shrink-0" aria-label={BRAND.name} onClick={() => setOpen(false)}>
           <LumiWordmark />
         </Link>
         <nav className="hidden items-center gap-7 text-sm text-muted md:flex">
-          <Link to="/" hash="spellen" className="hover:text-ink">
+          <Link to="/" hash="spellen" className="transition-colors hover:text-ink">
             Spellen
           </Link>
-          <Link to="/prijzen" className="hover:text-ink">
+          <Link to="/prijzen" className="transition-colors hover:text-ink">
             Prijzen
           </Link>
-          <Link to="/school" className="hover:text-ink">
+          <Link to="/school" className="transition-colors hover:text-ink">
             Voor school
           </Link>
-          <Link to="/over" className="hover:text-ink">
+          <Link to="/over" className="transition-colors hover:text-ink">
             Over
           </Link>
-          <Link to="/hulp" className="hover:text-ink">
+          <Link to="/hulp" className="transition-colors hover:text-ink">
             Hulp
           </Link>
         </nav>
@@ -45,13 +45,13 @@ export function SiteHeader({ dim = false }: { dim?: boolean }) {
             <>
               <Link
                 to="/spelen"
-                className="hidden h-11 items-center rounded-md px-3 text-sm font-medium text-ink hover:bg-surface-2 sm:inline-flex"
+                className="hidden h-11 items-center rounded-full px-3 text-sm font-medium text-ink hover:bg-surface-2 sm:inline-flex"
               >
                 Spelen
               </Link>
               <Link
                 to="/ouders"
-                className="hidden h-11 items-center rounded-md px-3 text-sm font-medium text-ink hover:bg-surface-2 sm:inline-flex"
+                className="hidden h-11 items-center rounded-full px-3 text-sm font-medium text-ink hover:bg-surface-2 sm:inline-flex"
               >
                 Ouderzone
               </Link>
@@ -61,14 +61,14 @@ export function SiteHeader({ dim = false }: { dim?: boolean }) {
             <>
               <Link
                 to="/login"
-                className="hidden h-11 items-center rounded-md px-3 text-sm font-medium text-ink hover:bg-surface-2 sm:inline-flex"
+                className="hidden h-11 items-center rounded-full px-3 text-sm font-medium text-ink hover:bg-surface-2 sm:inline-flex"
               >
                 Inloggen
               </Link>
               <Link
                 to="/login"
                 search={{ next: "/ouders" }}
-                className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-md bg-primary px-3 text-sm font-medium text-primary-fg sm:px-4"
+                className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-primary px-3 text-sm font-medium text-primary-fg shadow-[0_10px_22px_-12px_color-mix(in_oklab,var(--color-primary)_70%,transparent)] sm:px-4"
               >
                 7 dagen gratis
               </Link>
@@ -76,7 +76,7 @@ export function SiteHeader({ dim = false }: { dim?: boolean }) {
           )}
           <button
             type="button"
-            className="inline-flex size-11 items-center justify-center rounded-md hover:bg-surface-2 md:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-2 md:hidden"
             aria-label={open ? "Menu sluiten" : "Menu"}
             onClick={() => setOpen((v) => !v)}
           >
@@ -85,7 +85,7 @@ export function SiteHeader({ dim = false }: { dim?: boolean }) {
         </div>
       </div>
       {open ? (
-        <nav className="grid gap-1 border-t border-border px-4 py-3 text-sm md:hidden">
+        <nav className="grid gap-1 border-t border-border bg-surface/90 px-4 py-3 text-sm backdrop-blur-xl md:hidden">
           <Link to="/" hash="spellen" className="flex h-11 items-center" onClick={() => setOpen(false)}>
             Spellen
           </Link>
