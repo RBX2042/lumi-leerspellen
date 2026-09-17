@@ -33,6 +33,7 @@ export const GAME_ID_LIST = [
   "weeg",
   "spiegel",
   "zin",
+  "regen",
 ] as const;
 
 export type GameId = (typeof GAME_ID_LIST)[number];
@@ -236,6 +237,13 @@ export interface MirrorQuestion extends QuestionBase {
   target: boolean[];
 }
 
+export interface CatchQuestion extends QuestionBase {
+  kind: "catch";
+  target: number;
+  fallers: number[];
+  seconds: number;
+}
+
 export type Question =
   | ChoiceQuestion
   | TapQuestion
@@ -252,7 +260,8 @@ export type Question =
   | OrderQuestion
   | PathQuestion
   | BalanceQuestion
-  | MirrorQuestion;
+  | MirrorQuestion
+  | CatchQuestion;
 
 export type Visual =
   | { type: "dots"; count: number }
