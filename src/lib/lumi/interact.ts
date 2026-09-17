@@ -1,40 +1,52 @@
-import type {
-  BalanceQuestion,
-  BeadsQuestion,
-  Beat,
-  ClockSetQuestion,
-  CoinsQuestion,
-  FlipQuestion,
-  GridQuestion,
-  GroupKey,
-  LineQuestion,
-  MirrorQuestion,
-  OrderQuestion,
-  PairTapQuestion,
-  PathQuestion,
-  PieQuestion,
-  Question,
-  SortQuestion,
-  TilesQuestion,
-} from "./types.ts";
-import { groupIndex } from "./types.ts";
+import type { Question } from "./types.ts";
+import { centsLabel, formatSpoken } from "./interact-util.ts";
 
+export { centsLabel, formatSpoken, canTraceWord } from "./interact-util.ts";
+export { maak10, sprong, stapel, bakken, kassa, draai, clockSet, honderd } from "./interact-a.ts";
+export { taart, kralen, rij, jacht, weeg, spiegel, zin } from "./interact-b.ts";
 export { ballon, regen, sprint } from "./arcade.ts";
 
-function rand(n: number): number {
-  return Math.floor(Math.random() * n);
+export function isPlayBoard(q: Question): boolean {
+  return (
+    q.kind === "line" ||
+    q.kind === "tiles" ||
+    q.kind === "clockset" ||
+    q.kind === "sort" ||
+    q.kind === "pairtap" ||
+    q.kind === "coins" ||
+    q.kind === "flip" ||
+    q.kind === "grid" ||
+    q.kind === "pie" ||
+    q.kind === "beads" ||
+    q.kind === "order" ||
+    q.kind === "path" ||
+    q.kind === "balance" ||
+    q.kind === "mirror" ||
+    q.kind === "catch" ||
+    q.kind === "float" ||
+    q.kind === "dash"
+  );
 }
-function pick<T>(arr: readonly T[]): T {
-  return arr[rand(arr.length)]!;
-}
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = rand(i + 1);
-    [a[i], a[j]] = [a[j]!, a[i]!];
-  }
-  return a;
-}
-function between(min: number, max: number): number {
-  return min + rand(max - min + 1);
+
+export function answerLabel(q: Question): string | undefined {
+  if (q.kind === "choice") return q.choices[q.answer];
+  if (q.kind === "tap") return q.answer;
+  if (q.kind === "line") return String(q.answer);
+  if (q.kind === "tiles") return q.word;
+  if (q.kind === "clockset") return formatSpoken(q.hours, q.minutes);
+  if (q.kind === "sort") return `${q.left.label} / ${q.right.label}`;
+  if (q.kind === "pairtap") return String(q.target);
+  if (q.kind === "coins") return centsLabel(q.target);
+  if (q.kind === "flip") return "alle paren";
+  if (q.kind === "grid") return String(q.answer);
+  if (q.kind === "pie") return `${q.need}/${q.slices}`;
+  if (q.kind === "beads") return String(q.target);
+  if (q.kind === "order") return q.answer.map((id) => q.items.find((it) => it.id === id)?.label ?? id).join(" ");
+  if (q.kind === "path") return q.word;
+  if (q.kind === "balance") return String(q.left);
+  if (q.kind === "mirror") return "spiegelbeeld";
+  if (q.kind === "catch") return String(q.target);
+  if (q.kind === "float") return q.target;
+  if (q.kind === "dash") return q.chips.find((c) => c.ok)?.label ?? q.goal;
+  return undefined;
 }
