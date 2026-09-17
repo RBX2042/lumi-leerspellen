@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #f6f1e8;
-  --color-surface: #fffcf8;
-  --color-surface-2: #ede6da;
-  --color-ink: #1c1915;
-  --color-fg: #1c1915;
-  --color-muted: #6b655c;
-  --color-faint: #948c82;
+  --color-bg: #f4eee4;
+  --color-surface: #fffcf7;
+  --color-surface-2: #ece4d6;
+  --color-ink: #1a1714;
+  --color-fg: #1a1714;
+  --color-muted: #6a645b;
+  --color-faint: #938b81;
   --color-primary: #c45c38;
-  --color-primary-fg: #fffcf8;
-  --color-primary-soft: #f4e4da;
+  --color-primary-fg: #fffcf7;
+  --color-primary-soft: #f5e3d8;
   --color-clay: #9a4a2e;
-  --color-border: color-mix(in oklab, #1c1915 11%, transparent);
-  --color-border-strong: color-mix(in oklab, #1c1915 22%, transparent);
+  --color-border: color-mix(in oklab, #1a1714 11%, transparent);
+  --color-border-strong: color-mix(in oklab, #1a1714 22%, transparent);
   --color-ok: #3e6b50;
   --color-warn: #9a6b2f;
   --color-danger: #8b3a32;
@@ -25,14 +25,14 @@
   --font-display: "Fraunces", "Palatino Linotype", Georgia, serif;
   --radius-xs: 0.25rem;
   --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1.15rem;
-  --radius-xl: 1.75rem;
-  --shadow-card: 0 0 0 1px color-mix(in oklab, #1c1915 7%, transparent),
-    0 1px 2px color-mix(in oklab, #1c1915 6%, transparent),
-    0 18px 40px -22px color-mix(in oklab, #1c1915 22%, transparent);
-  --shadow-lift: 0 0 0 1px color-mix(in oklab, #1c1915 8%, transparent),
-    0 10px 8px -8px color-mix(in oklab, #1c1915 8%, transparent),
+  --radius-md: 0.85rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.85rem;
+  --shadow-card: 0 0 0 1px color-mix(in oklab, #1a1714 7%, transparent),
+    0 1px 2px color-mix(in oklab, #1a1714 6%, transparent),
+    0 18px 40px -22px color-mix(in oklab, #1a1714 22%, transparent);
+  --shadow-lift: 0 0 0 1px color-mix(in oklab, #1a1714 8%, transparent),
+    0 10px 8px -8px color-mix(in oklab, #1a1714 8%, transparent),
     0 28px 50px -24px color-mix(in oklab, #c45c38 28%, transparent);
 }
 
@@ -49,8 +49,9 @@
     margin: 0;
     min-height: 100dvh;
     background:
-      radial-gradient(1200px 520px at 88% -8%, color-mix(in oklab, var(--color-primary) 14%, transparent), transparent 58%),
-      radial-gradient(900px 480px at -10% 18%, color-mix(in oklab, var(--color-primary) 7%, transparent), transparent 52%),
+      radial-gradient(1180px 560px at 88% -10%, color-mix(in oklab, var(--color-primary) 16%, transparent), transparent 58%),
+      radial-gradient(820px 460px at -8% 16%, color-mix(in oklab, var(--color-clay) 10%, transparent), transparent 54%),
+      radial-gradient(640px 280px at 50% 120%, color-mix(in oklab, var(--color-primary) 6%, transparent), transparent 60%),
       var(--color-bg);
     color: var(--color-ink);
     font-family: var(--font-sans);
@@ -70,14 +71,10 @@
     line-height: 1.12;
   }
 
-  p {
-    text-wrap: pretty;
-  }
+  p { text-wrap: pretty; }
 
   button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
+  [role="button"]:not(:disabled) { cursor: pointer; }
 
   a,
   button,
@@ -94,207 +91,91 @@
 @layer components {
   .lumi-wash {
     background:
-      radial-gradient(900px 420px at 92% 0%, color-mix(in oklab, var(--color-primary) 16%, transparent), transparent 56%),
-      radial-gradient(620px 280px at 8% 88%, color-mix(in oklab, var(--color-primary) 8%, transparent), transparent 60%);
+      radial-gradient(920px 440px at 92% 0%, color-mix(in oklab, var(--color-primary) 18%, transparent), transparent 56%),
+      radial-gradient(640px 300px at 6% 90%, color-mix(in oklab, var(--color-clay) 10%, transparent), transparent 62%);
   }
-
   .lumi-paper {
     background-color: var(--color-surface);
     box-shadow: var(--shadow-card);
   }
-
   .lumi-ring {
     box-shadow:
-      0 0 0 8px color-mix(in oklab, var(--color-primary) 8%, transparent),
+      0 0 0 8px color-mix(in oklab, var(--color-primary) 9%, transparent),
       var(--shadow-card);
   }
-
   .lumi-lift {
-    transition:
-      transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
   }
-
   .lumi-lift:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     box-shadow: var(--shadow-lift);
   }
-}
-
-@keyframes lumi-pop {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.03);
-  }
-  100% {
-    transform: scale(1);
+  .lumi-glass {
+    background: color-mix(in oklab, var(--color-bg) 72%, transparent);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
   }
 }
 
-@keyframes lumi-shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  75% {
-    transform: translateX(5px);
-  }
+@keyframes lumi-pop { 0% { transform: scale(1); } 40% { transform: scale(1.03); } 100% { transform: scale(1); } }
+@keyframes lumi-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+@keyframes lumi-pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+@keyframes lumi-float { 0% { opacity: 1; transform: translateY(0) scale(0.9); } 100% { opacity: 0; transform: translateY(-36px) scale(1.05); } }
+@keyframes lumi-star-in { 0% { transform: scale(0.4); opacity: 0.4; } 55% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes lumi-burst { 0% { transform: scale(0.6); opacity: 0; } 40% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes lumi-fall { 0% { transform: translate3d(0, -8px, 0) rotate(0deg); opacity: 1; } 100% { transform: translate3d(var(--dx, 12px), 120px, 0) rotate(220deg); opacity: 0; } }
+@keyframes lumi-glow { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-primary) 0%, transparent); } 50% { box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-primary) 16%, transparent); } }
+@keyframes lumi-drift { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -8px, 0); } }
+@keyframes lumi-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes lumi-tile-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes lumi-faller {
+  0% { transform: translate3d(0, -18%, 0) rotate(-6deg); opacity: 0; }
+  8% { opacity: 1; }
+  100% { transform: translate3d(var(--dx, 8px), 118%, 0) rotate(12deg); opacity: 1; }
+}
+@keyframes lumi-rise-float {
+  0% { transform: translate3d(0, 110%, 0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translate3d(var(--wx, 0px), -18%, 0); opacity: 1; }
+}
+@keyframes lumi-wander {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(var(--wx, 12px), calc(var(--wy, 8px) * -1), 0); }
+  50% { transform: translate3d(calc(var(--wx, 12px) * -0.6), var(--wy, 8px), 0); }
+  75% { transform: translate3d(var(--wx, 12px), var(--wy, 8px), 0); }
+}
+@keyframes lumi-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@keyframes lumi-pop-out { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.4); opacity: 0; } }
+@keyframes lumi-combo-pop {
+  0% { transform: scale(0.8) translateY(6px); opacity: 0; }
+  55% { transform: scale(1.08) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-@keyframes lumi-pulse {
-  0%,
-  100% {
-    opacity: 0.45;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.lumi-pop {
-  animation: lumi-pop 280ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lumi-shake {
-  animation: lumi-shake 320ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lumi-pulse {
-  animation: lumi-pulse 1.6s ease-in-out infinite;
-}
-
-.lumi-combo {
-  animation: lumi-pop 280ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@keyframes lumi-float {
-  0% {
-    opacity: 1;
-    transform: translateY(0) scale(0.9);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-36px) scale(1.05);
-  }
-}
-
-@keyframes lumi-star-in {
-  0% {
-    transform: scale(0.4);
-    opacity: 0.4;
-  }
-  55% {
-    transform: scale(1.12);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes lumi-burst {
-  0% {
-    transform: scale(0.6);
-    opacity: 0;
-  }
-  40% {
-    transform: scale(1.08);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes lumi-fall {
-  0% {
-    transform: translate3d(0, -8px, 0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(var(--dx, 12px), 120px, 0) rotate(220deg);
-    opacity: 0;
-  }
-}
-
-@keyframes lumi-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-primary) 0%, transparent);
-  }
-  50% {
-    box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-primary) 16%, transparent);
-  }
-}
-
-@keyframes lumi-drift {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -8px, 0);
-  }
-}
-
-@keyframes lumi-rise {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.lumi-float {
-  animation: lumi-float 700ms ease-out forwards;
-}
-
-.lumi-star-in {
-  animation: lumi-star-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.lumi-burst {
-  animation: lumi-burst 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.lumi-fall {
-  animation: lumi-fall 900ms ease-in forwards;
-}
-
-.lumi-glow {
-  animation: lumi-glow 1.8s ease-in-out infinite;
-}
-
-.lumi-drift {
-  animation: lumi-drift 6.5s ease-in-out infinite;
-}
-
-.lumi-rise {
-  animation: lumi-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.lumi-pip {
-  transition: background-color 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lumi-pip-on {
-  transform: scaleY(1.4);
-}
+.lumi-pop { animation: lumi-pop 280ms cubic-bezier(0.22, 1, 0.36, 1); }
+.lumi-shake { animation: lumi-shake 320ms cubic-bezier(0.22, 1, 0.36, 1); }
+.lumi-pulse { animation: lumi-pulse 1.6s ease-in-out infinite; }
+.lumi-combo { animation: lumi-combo-pop 320ms cubic-bezier(0.22, 1, 0.36, 1); }
+.lumi-float { animation: lumi-float 700ms ease-out forwards; }
+.lumi-star-in { animation: lumi-star-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.lumi-burst { animation: lumi-burst 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.lumi-fall { animation: lumi-fall 900ms ease-in forwards; }
+.lumi-glow { animation: lumi-glow 1.8s ease-in-out infinite; }
+.lumi-drift { animation: lumi-drift 6.5s ease-in-out infinite; }
+.lumi-rise { animation: lumi-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.lumi-press { transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1); }
+.lumi-press:active { transform: scale(0.92); }
+.lumi-tile-in { animation: lumi-tile-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.lumi-faller { animation: lumi-faller linear forwards; }
+.lumi-rise-float { animation: lumi-rise-float linear forwards; }
+.lumi-wander { animation: lumi-wander ease-in-out infinite alternate; }
+.lumi-drain { animation: lumi-drain linear forwards; transform-origin: left center; }
+.lumi-pop-out { animation: lumi-pop-out 180ms ease-in forwards; pointer-events: none; }
+.lumi-pip { transition: background-color 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1); }
+.lumi-pip-on { transform: scaleY(1.4); }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -302,8 +183,5 @@
 }
 
 @media print {
-  header,
-  footer {
-    display: none !important;
-  }
+  header, footer { display: none !important; }
 }

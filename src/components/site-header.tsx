@@ -13,8 +13,8 @@ export function SiteHeader({ dim = false }: { dim?: boolean }) {
     <header
       className={
         dim
-          ? "sticky top-0 z-30 border-b border-border/80 bg-bg/75 pt-[env(safe-area-inset-top)] backdrop-blur-xl"
-          : "sticky top-0 z-30 border-b border-border/80 bg-bg/75 pt-[env(safe-area-inset-top)] backdrop-blur-xl"
+          ? "lumi-glass sticky top-0 z-30 border-b border-border/70 pt-[env(safe-area-inset-top)]"
+          : "lumi-glass sticky top-0 z-30 border-b border-border/70 pt-[env(safe-area-inset-top)]"
       }
     >
       <div className="mx-auto flex h-[4.35rem] max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4">
