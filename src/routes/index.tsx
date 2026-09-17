@@ -21,6 +21,13 @@ const TONE_WASH: Record<string, string> = {
   wereld: "from-tone-wereld/18",
 };
 
+const TONE_ART: Record<string, string> = {
+  rekenen: "/art/tone-rekenen.jpg",
+  taal: "/art/tone-taal.jpg",
+  denken: "/art/tone-denken.jpg",
+  wereld: "/art/tone-wereld.jpg",
+};
+
 function Home() {
   useEffect(() => {
     const id = window.location.hash.replace(/^#/, "");
@@ -36,7 +43,14 @@ function Home() {
       <main>
         <section className="relative overflow-hidden">
           <div className="pointer-events-none absolute inset-0 lumi-wash" />
-          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-10 md:grid-cols-[1.1fr_0.9fr] md:gap-12 md:pb-24 md:pt-16 lg:gap-16 lg:pb-28 lg:pt-20">
+          <img
+            src="/art/owl.jpg"
+            alt=""
+            className="pointer-events-none absolute -right-16 top-8 hidden h-64 w-auto opacity-[0.14] lg:block"
+            width={200}
+            height={298}
+          />
+          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-10 md:grid-cols-[1.05fr_0.95fr] md:gap-12 md:pb-24 md:pt-16 lg:gap-16 lg:pb-28 lg:pt-20">
             <div className="lumi-rise">
               <Badge>{BRAND.category} · 4–12 jaar</Badge>
               <h1 className="mt-6 font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl lg:text-6xl">
@@ -76,22 +90,31 @@ function Home() {
                 n: "01",
                 k: "Ophalen, niet herlezen",
                 v: "Kinderen onthouden meer als ze het zelf moeten ophalen. Ze tikken, slepen en bouwen — met uitleg erbij, geen lege ‘goed zo’.",
+                art: "/art/tone-rekenen.jpg",
               },
               {
                 n: "02",
                 k: "Past zich aan",
                 v: "Drie goed? Een trede omhoog. Twee mis? Een trede terug. Altijd in de zone waar het nog lukt.",
+                art: "/art/tone-denken.jpg",
               },
               {
                 n: "03",
                 k: "Kort, en ze komen terug",
                 v: "Sessies van 6 tot 12 minuten. Een dagelijkse reeks, XP en badges. Jij zet de daglimiet — Lumi stopt als de tijd om is.",
+                art: "/art/ouders-avond.jpg",
               },
             ].map((x) => (
-              <Card key={x.n} className="rounded-3xl p-6">
-                <p className="font-display text-sm tabular-nums text-primary">{x.n}</p>
-                <h2 className="mt-3 font-display text-2xl font-medium">{x.k}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{x.v}</p>
+              <Card key={x.n} className="lumi-lift overflow-hidden rounded-3xl p-0">
+                <div className="relative h-36 overflow-hidden">
+                  <img src={x.art} alt="" className="size-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent" />
+                </div>
+                <div className="p-6 pt-4">
+                  <p className="font-display text-sm tabular-nums text-primary">{x.n}</p>
+                  <h2 className="mt-3 font-display text-2xl font-medium">{x.k}</h2>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">{x.v}</p>
+                </div>
               </Card>
             ))}
           </div>
@@ -111,20 +134,27 @@ function Home() {
             {GAMES.map((g) => (
               <Card
                 key={g.id}
-                className="group relative flex flex-col overflow-hidden rounded-3xl p-0 hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
+                className="lumi-lift group relative flex flex-col overflow-hidden rounded-3xl p-0"
               >
-                <div className={cn("h-16 bg-gradient-to-b to-transparent", TONE_WASH[g.tone])} />
+                <div className="relative h-[5.5rem] overflow-hidden">
+                  <img
+                    src={TONE_ART[g.tone] ?? TONE_ART.rekenen}
+                    alt=""
+                    className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                  />
+                  <div className={cn("absolute inset-0 bg-gradient-to-t to-transparent", TONE_WASH[g.tone])} />
+                </div>
                 <span className={cn("absolute inset-y-0 left-0 w-1", TONE_BAR[g.tone])} />
-                <div className="-mt-8 flex flex-1 flex-col p-5 pt-0">
-                  <div className="flex items-start justify-between gap-2 pl-2">
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="flex items-start justify-between gap-2 pl-1">
                     <p className={cn("text-xs font-medium uppercase tracking-wider", TONE_TEXT[g.tone])}>
                       {g.subject}
                     </p>
                     {g.free ? <Badge variant="muted">Gratis</Badge> : <Badge>Gezin</Badge>}
                   </div>
-                  <h3 className="mt-3 pl-2 font-display text-xl font-medium">{g.title}</h3>
-                  <p className="mt-2 flex-1 pl-2 text-sm leading-relaxed text-muted">{g.blurb}</p>
-                  <p className="mt-4 pl-2 text-xs text-faint">
+                  <h3 className="mt-3 pl-1 font-display text-xl font-medium">{g.title}</h3>
+                  <p className="mt-2 flex-1 pl-1 text-sm leading-relaxed text-muted">{g.blurb}</p>
+                  <p className="mt-4 pl-1 text-xs text-faint">
                     {g.ages} · {g.minutes}
                   </p>
                 </div>
@@ -134,6 +164,12 @@ function Home() {
         </section>
 
         <section id="waarom" className="relative overflow-hidden bg-ink text-primary-fg">
+          <img
+            src="/art/tone-taal.jpg"
+            alt=""
+            className="pointer-events-none absolute inset-0 size-full object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-ink/80" />
           <div className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-primary/20 blur-3xl" />
           <div className="relative mx-auto max-w-6xl px-4 py-24">
             <Kicker onInk>Waarom dit, en niet nóg een quiz-app</Kicker>
@@ -184,31 +220,32 @@ function Home() {
                 ))}
               </ul>
             </div>
-            <Card className="rounded-3xl p-6 lg:p-8">
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-faint">Deze week</p>
-              <p className="mt-2 font-display text-2xl">Noor · groep 4</p>
-              <div className="mt-6 grid gap-4">
-                {[
-                  ["Tafels", 78],
-                  ["Spelling", 62],
-                  ["Klokkijken", 40],
-                  ["Werkgeheugen", 84],
-                ].map(([k, v]) => (
-                  <div key={String(k)}>
-                    <div className="mb-1.5 flex justify-between text-sm">
-                      <span>{k}</span>
-                      <span className="tabular-nums text-muted">{v}%</span>
-                    </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-surface-2">
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${v}%` }} />
-                    </div>
-                  </div>
-                ))}
+            <div className="relative">
+              <div className="overflow-hidden rounded-[1.9rem] shadow-[var(--shadow-lift)]">
+                <img src="/art/ouders-avond.jpg" alt="" className="aspect-[5/4] w-full object-cover" />
               </div>
-              <p className="mt-6 text-sm text-muted">
-                34 minuten gespeeld · sterkste groei op tafels van 7.
-              </p>
-            </Card>
+              <Card className="absolute right-3 bottom-3 left-3 rounded-3xl p-5 sm:left-auto sm:w-80">
+                <p className="text-xs font-medium uppercase tracking-[0.16em] text-faint">Deze week</p>
+                <p className="mt-2 font-display text-2xl">Noor · groep 4</p>
+                <div className="mt-4 grid gap-3">
+                  {[
+                    ["Tafels", 78],
+                    ["Spelling", 62],
+                    ["Klokkijken", 40],
+                  ].map(([k, v]) => (
+                    <div key={String(k)}>
+                      <div className="mb-1 flex justify-between text-sm">
+                        <span>{k}</span>
+                        <span className="tabular-nums text-muted">{v}%</span>
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-surface-2">
+                        <div className="h-full rounded-full bg-primary" style={{ width: `${v}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
           </div>
         </section>
 
@@ -226,8 +263,8 @@ function Home() {
                   key={p.id}
                   className={
                     p.highlight
-                      ? "rounded-3xl p-6 ring-2 ring-primary shadow-[var(--shadow-lift)]"
-                      : "rounded-3xl p-6"
+                      ? "lumi-lift rounded-3xl p-6 ring-2 ring-primary shadow-[var(--shadow-lift)]"
+                      : "lumi-lift rounded-3xl p-6"
                   }
                 >
                   {p.highlight ? <Badge className="mb-3">Meest gekozen</Badge> : null}
@@ -288,9 +325,11 @@ function Home() {
         </section>
 
         <section className="px-4 pb-24">
-          <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl bg-ink px-6 py-14 text-primary-fg sm:px-14">
-            <div className="pointer-events-none absolute -left-16 bottom-0 size-64 rounded-full bg-primary/25 blur-3xl" />
-            <div className="relative">
+          <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl text-primary-fg">
+            <img src="/art/ouders-avond.jpg" alt="" className="absolute inset-0 size-full object-cover" />
+            <div className="absolute inset-0 bg-ink/72" />
+            <div className="relative px-6 py-14 sm:px-14">
+              <img src="/art/owl-square.jpg" alt="" className="mb-5 size-16 rounded-2xl object-cover shadow-[var(--shadow-card)]" />
               <Kicker onInk>{BRAND.tagline}</Kicker>
               <h2 className="mt-4 font-display text-3xl font-medium sm:text-4xl">
                 Vanavond nog een ronde tafels. Morgen zie jij of het zat.
@@ -314,7 +353,7 @@ function Home() {
 
 function Fact({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-3xl bg-white/5 p-6 ring-1 ring-white/10">
+    <div className="rounded-3xl bg-white/5 p-6 ring-1 ring-white/10 backdrop-blur-sm">
       <h3 className="font-display text-xl font-medium">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-primary-fg/65">{body}</p>
     </div>
@@ -325,31 +364,17 @@ function HeroPanel() {
   return (
     <div className="relative mx-auto w-full max-w-md lumi-drift">
       <div className="absolute -right-6 -top-6 size-24 rounded-full bg-primary/15 blur-2xl" />
-      <div className="relative rounded-[1.9rem] bg-surface p-2 shadow-[var(--shadow-lift)] lumi-ring">
-        <div className="rounded-[1.4rem] bg-bg px-5 py-6">
+      <div className="relative overflow-hidden rounded-[1.9rem] bg-surface shadow-[var(--shadow-lift)] lumi-ring">
+        <img src="/art/hero-table.jpg" alt="Houten tafel met tablet, cijferblokken en een uil." className="aspect-[5/4] w-full object-cover" />
+        <div className="absolute inset-x-3 bottom-3 rounded-[1.15rem] bg-surface/92 p-3 shadow-[var(--shadow-card)] backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <img src="/logo-mark.svg" alt="" className="size-9" width={36} height={36} />
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-faint">Nu spelen</p>
-              <p className="font-display text-lg leading-tight">Honderdveld · groep 4</p>
+            <img src="/art/owl-square.jpg" alt="" className="size-10 rounded-xl object-cover" width={40} height={40} />
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">Nu spelen</p>
+              <p className="truncate font-display text-base leading-tight">Honderdveld · groep 4</p>
             </div>
+            <p className="ml-auto text-xs tabular-nums text-muted">3 op rij</p>
           </div>
-          <p className="mt-6 text-center font-display text-2xl font-medium tracking-tight">Tik het vak van 17</p>
-          <div className="mx-auto mt-5 grid max-w-[220px] grid-cols-5 gap-1.5">
-            {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
-              <div
-                key={n}
-                className={
-                  n === 17
-                    ? "grid aspect-square place-items-center rounded-lg bg-ok text-sm font-medium text-primary-fg shadow-sm"
-                    : "grid aspect-square place-items-center rounded-lg bg-surface text-sm font-medium shadow-[var(--shadow-card)]"
-                }
-              >
-                {n}
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 text-center text-sm text-muted">3 goed op rij · niveau 4</p>
         </div>
       </div>
     </div>
