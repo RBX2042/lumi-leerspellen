@@ -2,8 +2,6 @@ import { GAMES } from "./catalog.ts";
 import { dayKey } from "./day.ts";
 import type { Beat, GameId, PlaySession } from "./types.ts";
 
-
-/** Consecutive calendar days with at least one play, counting back from today (or yesterday if today is empty). */
 export function consecutivePlayDays(sessions: PlaySession[], childId: number, now = new Date()): number {
   const days = new Set(
     sessions
@@ -109,6 +107,9 @@ const TIPS: Record<GameId, string> = {
   weeg: "Rechts moet even zwaar zijn als links. Grootste gewicht eerst.",
   spiegel: "Wat links zit, zit rechts even ver van de stippellijn.",
   zin: "Wie of wat eerst. Daarna de rest van de zin.",
+  regen: "Kijk welk getal je zoekt. Tik alleen die. De rest laat je vallen.",
+  ballon: "Zoek het getal. Prik alleen die ballon. De rest laat je stijgen.",
+  sprint: "Reken de som eerst. Tik daarna het antwoord dat springt.",
 };
 
 export function defaultHint(gameId: GameId): string {
@@ -129,7 +130,13 @@ export function briefing(
       ? `Vorige keer: ${prior.join(" en ")}. Die komen terug — zo blijft het zitten.`
       : gameId === "tafeltuin"
         ? `Tafel van ${table}. Zeg hem in je hoofd voor je tikt.`
-        : (game?.mission ?? "Korte ronde. Daarna klaar.");
+        : gameId === "regen"
+          ? "Getallen vallen. Tik alleen het goede — de rest laat je gaan."
+          : gameId === "ballon"
+            ? "Ballonnen stijgen. Prik alleen het goede getal."
+            : gameId === "sprint"
+              ? "De som staat stil. De antwoorden springen. Reken eerst, dan tik."
+              : (game?.mission ?? "Korte ronde. Daarna klaar.");
   return {
     kicker: game?.title ?? "Spel",
     title: `Klaar, ${name}?`,
@@ -220,6 +227,9 @@ export function tomorrowHook(gameId: GameId, level: number): string {
   if (gameId === "weeg") return "Morgen een ander gewicht. Links is rechts — tot het vanzelf klopt.";
   if (gameId === "spiegel") return "Morgen een nieuwe vorm. De as is de stippellijn.";
   if (gameId === "zin") return "Morgen weer een zin. Wie of wat eerst, dan loopt hij.";
+  if (gameId === "regen") return "Morgen valt de regen weer. Kijk eerst, dan tik — niet gokken.";
+  if (gameId === "ballon") return "Morgen stijgen nieuwe ballonnen. Kijk welk getal je zoekt, dan prik.";
+  if (gameId === "sprint") return "Morgen weer een som die beweegt. Eerst rekenen, dan tikken.";
   return `Morgen nog een ronde ${game?.title ?? "spel"}. Korte herhaling wint van lang blokken.`;
 }
 
