@@ -13,11 +13,18 @@ export function Kicker({
   return (
     <p
       className={cn(
-        "text-xs font-medium uppercase tracking-[0.18em]",
+        "inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em]",
         onInk ? "text-primary-fg/55" : "text-faint",
         className,
       )}
     >
+      <span
+        className={cn(
+          "size-1.5 rounded-full",
+          onInk ? "bg-primary" : "bg-primary/80",
+        )}
+        aria-hidden
+      />
       {children}
     </p>
   );
