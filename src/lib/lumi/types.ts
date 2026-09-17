@@ -34,6 +34,8 @@ export const GAME_ID_LIST = [
   "spiegel",
   "zin",
   "regen",
+  "ballon",
+  "sprint",
 ] as const;
 
 export type GameId = (typeof GAME_ID_LIST)[number];
@@ -244,6 +246,20 @@ export interface CatchQuestion extends QuestionBase {
   seconds: number;
 }
 
+export interface FloatQuestion extends QuestionBase {
+  kind: "float";
+  target: string;
+  floaters: string[];
+  seconds: number;
+}
+
+export interface DashQuestion extends QuestionBase {
+  kind: "dash";
+  goal: string;
+  chips: { label: string; ok: boolean }[];
+  seconds: number;
+}
+
 export type Question =
   | ChoiceQuestion
   | TapQuestion
@@ -261,7 +277,9 @@ export type Question =
   | PathQuestion
   | BalanceQuestion
   | MirrorQuestion
-  | CatchQuestion;
+  | CatchQuestion
+  | FloatQuestion
+  | DashQuestion;
 
 export type Visual =
   | { type: "dots"; count: number }
