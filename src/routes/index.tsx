@@ -14,6 +14,13 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: Home });
 
+const TONE_WASH: Record<string, string> = {
+  rekenen: "from-tone-rekenen/18",
+  taal: "from-tone-taal/18",
+  denken: "from-tone-denken/18",
+  wereld: "from-tone-wereld/18",
+};
+
 function Home() {
   useEffect(() => {
     const id = window.location.hash.replace(/^#/, "");
@@ -27,15 +34,14 @@ function Home() {
     <div className="min-h-dvh bg-bg">
       <SiteHeader />
       <main>
-        <section>
-          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-10 md:grid-cols-[1.1fr_0.9fr] md:gap-12 md:pb-24 md:pt-16 lg:gap-16 lg:pb-28 lg:pt-20">
-            <div>
-              <Badge>
-                {BRAND.category} · 4–12 jaar
-              </Badge>
+        <section className="relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 lumi-wash" />
+          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-10 md:grid-cols-[1.1fr_0.9fr] md:gap-12 md:pb-24 md:pt-16 lg:gap-16 lg:pb-28 lg:pt-20">
+            <div className="lumi-rise">
+              <Badge>{BRAND.category} · 4–12 jaar</Badge>
               <h1 className="mt-6 font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl lg:text-6xl">
                 Schermtijd waar een kind{" "}
-                <em className="font-medium italic">écht</em> van leert.
+                <em className="font-medium italic text-clay">écht</em> van leert.
               </h1>
               <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
                 {dutchGameCount(true)} korte leerspellen, afgestemd op groep 1 tot 8. Jij ziet de
@@ -63,8 +69,8 @@ function Home() {
           </div>
         </section>
 
-        <section className="border-y border-border bg-surface">
-          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-3 md:gap-12">
+        <section className="border-y border-border bg-surface/80">
+          <div className="mx-auto grid max-w-6xl gap-5 px-4 py-16 md:grid-cols-3 md:gap-6">
             {[
               {
                 n: "01",
@@ -82,11 +88,11 @@ function Home() {
                 v: "Sessies van 6 tot 12 minuten. Een dagelijkse reeks, XP en badges. Jij zet de daglimiet — Lumi stopt als de tijd om is.",
               },
             ].map((x) => (
-              <div key={x.n}>
-                <p className="font-display text-sm tabular-nums text-faint">{x.n}</p>
+              <Card key={x.n} className="rounded-3xl p-6">
+                <p className="font-display text-sm tabular-nums text-primary">{x.n}</p>
                 <h2 className="mt-3 font-display text-2xl font-medium">{x.k}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{x.v}</p>
-              </div>
+              </Card>
             ))}
           </div>
         </section>
@@ -103,31 +109,38 @@ function Home() {
           </p>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {GAMES.map((g) => (
-              <Card key={g.id} className="relative flex flex-col overflow-hidden rounded-2xl p-5">
+              <Card
+                key={g.id}
+                className="group relative flex flex-col overflow-hidden rounded-3xl p-0 hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
+              >
+                <div className={cn("h-16 bg-gradient-to-b to-transparent", TONE_WASH[g.tone])} />
                 <span className={cn("absolute inset-y-0 left-0 w-1", TONE_BAR[g.tone])} />
-                <div className="flex items-start justify-between gap-2 pl-2">
-                  <p className={cn("text-xs font-medium uppercase tracking-wider", TONE_TEXT[g.tone])}>
-                    {g.subject}
+                <div className="-mt-8 flex flex-1 flex-col p-5 pt-0">
+                  <div className="flex items-start justify-between gap-2 pl-2">
+                    <p className={cn("text-xs font-medium uppercase tracking-wider", TONE_TEXT[g.tone])}>
+                      {g.subject}
+                    </p>
+                    {g.free ? <Badge variant="muted">Gratis</Badge> : <Badge>Gezin</Badge>}
+                  </div>
+                  <h3 className="mt-3 pl-2 font-display text-xl font-medium">{g.title}</h3>
+                  <p className="mt-2 flex-1 pl-2 text-sm leading-relaxed text-muted">{g.blurb}</p>
+                  <p className="mt-4 pl-2 text-xs text-faint">
+                    {g.ages} · {g.minutes}
                   </p>
-                  {g.free ? <Badge variant="muted">Gratis</Badge> : <Badge>Gezin</Badge>}
                 </div>
-                <h3 className="mt-3 pl-2 font-display text-xl font-medium">{g.title}</h3>
-                <p className="mt-2 flex-1 pl-2 text-sm leading-relaxed text-muted">{g.blurb}</p>
-                <p className="mt-4 pl-2 text-xs text-faint">
-                  {g.ages} · {g.minutes}
-                </p>
               </Card>
             ))}
           </div>
         </section>
 
-        <section id="waarom" className="bg-ink text-primary-fg">
-          <div className="mx-auto max-w-6xl px-4 py-24">
+        <section id="waarom" className="relative overflow-hidden bg-ink text-primary-fg">
+          <div className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-primary/20 blur-3xl" />
+          <div className="relative mx-auto max-w-6xl px-4 py-24">
             <Kicker onInk>Waarom dit, en niet nóg een quiz-app</Kicker>
             <h2 className="mt-3 max-w-2xl font-display text-3xl font-medium sm:text-4xl">
               Ouders betalen al voor schermtijd. Lumi maakt die tijd verantwoord.
             </h2>
-            <div className="mt-14 grid gap-10 md:grid-cols-2">
+            <div className="mt-14 grid gap-6 md:grid-cols-2">
               <Fact
                 title="Squla is sterk, maar per kind"
                 body="De bekendste Nederlandse oefenapp rekent grofweg twaalf euro per kind. Gezinnen met twee of drie schoolgaande kinderen betalen dubbel. Lumi Gezin dekt tot vier profielen voor één prijs."
@@ -155,21 +168,23 @@ function Home() {
               <h2 className="mt-3 font-display text-3xl font-medium sm:text-4xl">
                 Jij ziet de voortgang. Zij zien alleen het spel.
               </h2>
-              <ul className="mt-8 grid gap-4 text-sm text-muted">
+              <ul className="mt-8 grid gap-3 text-sm text-muted">
                 {[
                   { icon: Users, t: "Tot vier kindprofielen, elk met eigen niveau" },
                   { icon: Clock, t: "Schermtijd in minuten, niet in vage ‘sessies’" },
                   { icon: Shield, t: "Geen chat, geen vriendenlijst, geen tracking-ads" },
                   { icon: Lock, t: "Terug naar ouderzone achter een pincode" },
                 ].map((x) => (
-                  <li key={x.t} className="flex gap-3">
-                    <x.icon className="mt-0.5 size-4 text-clay" />
+                  <li key={x.t} className="flex items-center gap-3 rounded-2xl bg-surface px-4 py-3 shadow-[var(--shadow-card)]">
+                    <span className="grid size-9 place-items-center rounded-full bg-primary-soft text-clay">
+                      <x.icon className="size-4" />
+                    </span>
                     {x.t}
                   </li>
                 ))}
               </ul>
             </div>
-            <Card className="rounded-2xl p-6">
+            <Card className="rounded-3xl p-6 lg:p-8">
               <p className="text-xs font-medium uppercase tracking-[0.16em] text-faint">Deze week</p>
               <p className="mt-2 font-display text-2xl">Noor · groep 4</p>
               <div className="mt-6 grid gap-4">
@@ -184,7 +199,7 @@ function Home() {
                       <span>{k}</span>
                       <span className="tabular-nums text-muted">{v}%</span>
                     </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
+                    <div className="h-2 overflow-hidden rounded-full bg-surface-2">
                       <div className="h-full rounded-full bg-primary" style={{ width: `${v}%` }} />
                     </div>
                   </div>
@@ -197,7 +212,7 @@ function Home() {
           </div>
         </section>
 
-        <section className="border-y border-border bg-surface">
+        <section className="border-y border-border bg-surface/80">
           <div className="mx-auto max-w-6xl px-4 py-24">
             <Kicker>Prijzen</Kicker>
             <h2 className="mt-3 font-display text-3xl font-medium">Eerlijke prijs.</h2>
@@ -211,10 +226,11 @@ function Home() {
                   key={p.id}
                   className={
                     p.highlight
-                      ? "rounded-2xl p-6 ring-2 ring-primary"
-                      : "rounded-2xl p-6"
+                      ? "rounded-3xl p-6 ring-2 ring-primary shadow-[var(--shadow-lift)]"
+                      : "rounded-3xl p-6"
                   }
                 >
+                  {p.highlight ? <Badge className="mb-3">Meest gekozen</Badge> : null}
                   <p className="text-sm text-muted">{p.name}</p>
                   <p className="mt-2 font-display text-4xl tabular-nums">
                     {p.priceMonth === 0 ? "€0" : `€${p.priceMonth.toString().replace(".", ",")}`}
@@ -244,7 +260,7 @@ function Home() {
 
         <section className="mx-auto max-w-3xl px-4 py-24">
           <h2 className="font-display text-3xl font-medium">Vragen van ouders</h2>
-          <dl className="mt-10 grid gap-10">
+          <dl className="mt-10 grid gap-4">
             {[
               {
                 q: "Is dit niet gewoon extra schermtijd?",
@@ -263,7 +279,7 @@ function Home() {
                 a: "In de ouderzone, knop ‘Opzeggen’. Geen mail naar een helpdesk, geen verstopte knop. De rest van de periode blijft werken, daarna val je terug op Ontdekker.",
               },
             ].map((x) => (
-              <div key={x.q}>
+              <div key={x.q} className="rounded-3xl bg-surface px-6 py-5 shadow-[var(--shadow-card)]">
                 <dt className="font-display text-xl font-medium">{x.q}</dt>
                 <dd className="mt-2 text-sm leading-relaxed text-muted">{x.a}</dd>
               </div>
@@ -272,18 +288,21 @@ function Home() {
         </section>
 
         <section className="px-4 pb-24">
-          <div className="mx-auto max-w-4xl rounded-2xl bg-ink px-6 py-14 text-primary-fg sm:px-14">
-            <Kicker onInk>{BRAND.tagline}</Kicker>
-            <h2 className="mt-4 font-display text-3xl font-medium sm:text-4xl">
-              Vanavond nog een ronde tafels. Morgen zie jij of het zat.
-            </h2>
-            <div className="mt-8">
-              <Button size="lg" asChild>
-                <Link to="/login" search={{ next: "/ouders" }}>
-                  Maak een ouderaccount
-                  <ArrowRight />
-                </Link>
-              </Button>
+          <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl bg-ink px-6 py-14 text-primary-fg sm:px-14">
+            <div className="pointer-events-none absolute -left-16 bottom-0 size-64 rounded-full bg-primary/25 blur-3xl" />
+            <div className="relative">
+              <Kicker onInk>{BRAND.tagline}</Kicker>
+              <h2 className="mt-4 font-display text-3xl font-medium sm:text-4xl">
+                Vanavond nog een ronde tafels. Morgen zie jij of het zat.
+              </h2>
+              <div className="mt-8">
+                <Button size="lg" asChild>
+                  <Link to="/login" search={{ next: "/ouders" }}>
+                    Maak een ouderaccount
+                    <ArrowRight />
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -295,7 +314,7 @@ function Home() {
 
 function Fact({ title, body }: { title: string; body: string }) {
   return (
-    <div>
+    <div className="rounded-3xl bg-white/5 p-6 ring-1 ring-white/10">
       <h3 className="font-display text-xl font-medium">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-primary-fg/65">{body}</p>
     </div>
@@ -304,9 +323,10 @@ function Fact({ title, body }: { title: string; body: string }) {
 
 function HeroPanel() {
   return (
-    <div className="relative mx-auto w-full max-w-md">
-      <div className="rounded-[1.75rem] bg-surface p-2 shadow-[var(--shadow-card)]">
-        <div className="rounded-2xl bg-bg px-5 py-6">
+    <div className="relative mx-auto w-full max-w-md lumi-drift">
+      <div className="absolute -right-6 -top-6 size-24 rounded-full bg-primary/15 blur-2xl" />
+      <div className="relative rounded-[1.9rem] bg-surface p-2 shadow-[var(--shadow-lift)] lumi-ring">
+        <div className="rounded-[1.4rem] bg-bg px-5 py-6">
           <div className="flex items-center gap-3">
             <img src="/logo-mark.svg" alt="" className="size-9" width={36} height={36} />
             <div>
@@ -321,8 +341,8 @@ function HeroPanel() {
                 key={n}
                 className={
                   n === 17
-                    ? "grid aspect-square place-items-center rounded-md bg-ok text-sm font-medium text-primary-fg"
-                    : "grid aspect-square place-items-center rounded-md bg-surface text-sm font-medium shadow-[var(--shadow-card)]"
+                    ? "grid aspect-square place-items-center rounded-lg bg-ok text-sm font-medium text-primary-fg shadow-sm"
+                    : "grid aspect-square place-items-center rounded-lg bg-surface text-sm font-medium shadow-[var(--shadow-card)]"
                 }
               >
                 {n}

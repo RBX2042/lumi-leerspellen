@@ -108,73 +108,193 @@
       0 0 0 8px color-mix(in oklab, var(--color-primary) 8%, transparent),
       var(--shadow-card);
   }
+
+  .lumi-lift {
+    transition:
+      transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .lumi-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+  }
 }
 
 @keyframes lumi-pop {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.03); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes lumi-shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 @keyframes lumi-pulse {
-  0%, 100% { opacity: 0.45; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
-.lumi-pop { animation: lumi-pop 280ms cubic-bezier(0.22, 1, 0.36, 1); }
-.lumi-shake { animation: lumi-shake 320ms cubic-bezier(0.22, 1, 0.36, 1); }
-.lumi-pulse { animation: lumi-pulse 1.6s ease-in-out infinite; }
-.lumi-combo { animation: lumi-pop 280ms cubic-bezier(0.22, 1, 0.36, 1); }
+.lumi-pop {
+  animation: lumi-pop 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lumi-shake {
+  animation: lumi-shake 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lumi-pulse {
+  animation: lumi-pulse 1.6s ease-in-out infinite;
+}
+
+.lumi-combo {
+  animation: lumi-pop 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
 
 @keyframes lumi-float {
-  0% { opacity: 1; transform: translateY(0) scale(0.9); }
-  100% { opacity: 0; transform: translateY(-36px) scale(1.05); }
-}
-@keyframes lumi-star-in {
-  0% { transform: scale(0.4); opacity: 0.4; }
-  55% { transform: scale(1.12); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}
-@keyframes lumi-burst {
-  0% { transform: scale(0.6); opacity: 0; }
-  40% { transform: scale(1.08); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}
-@keyframes lumi-fall {
-  0% { transform: translate3d(0, -8px, 0) rotate(0deg); opacity: 1; }
-  100% { transform: translate3d(var(--dx, 12px), 120px, 0) rotate(220deg); opacity: 0; }
-}
-@keyframes lumi-glow {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-primary) 0%, transparent); }
-  50% { box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-primary) 16%, transparent); }
-}
-@keyframes lumi-drift {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -8px, 0); }
-}
-@keyframes lumi-rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-36px) scale(1.05);
+  }
 }
 
-.lumi-float { animation: lumi-float 700ms ease-out forwards; }
-.lumi-star-in { animation: lumi-star-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-.lumi-burst { animation: lumi-burst 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-.lumi-fall { animation: lumi-fall 900ms ease-in forwards; }
-.lumi-glow { animation: lumi-glow 1.8s ease-in-out infinite; }
-.lumi-drift { animation: lumi-drift 6.5s ease-in-out infinite; }
-.lumi-rise { animation: lumi-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-.lumi-pip { transition: background-color 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1); }
-.lumi-pip-on { transform: scaleY(1.4); }
+@keyframes lumi-star-in {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.4;
+  }
+  55% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes lumi-burst {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes lumi-fall {
+  0% {
+    transform: translate3d(0, -8px, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--dx, 12px), 120px, 0) rotate(220deg);
+    opacity: 0;
+  }
+}
+
+@keyframes lumi-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-primary) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-primary) 16%, transparent);
+  }
+}
+
+@keyframes lumi-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+@keyframes lumi-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lumi-float {
+  animation: lumi-float 700ms ease-out forwards;
+}
+
+.lumi-star-in {
+  animation: lumi-star-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.lumi-burst {
+  animation: lumi-burst 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.lumi-fall {
+  animation: lumi-fall 900ms ease-in forwards;
+}
+
+.lumi-glow {
+  animation: lumi-glow 1.8s ease-in-out infinite;
+}
+
+.lumi-drift {
+  animation: lumi-drift 6.5s ease-in-out infinite;
+}
+
+.lumi-rise {
+  animation: lumi-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.lumi-pip {
+  transition: background-color 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lumi-pip-on {
+  transform: scaleY(1.4);
+}
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -182,5 +302,8 @@
 }
 
 @media print {
-  header, footer { display: none !important; }
+  header,
+  footer {
+    display: none !important;
+  }
 }
