@@ -54,6 +54,8 @@ export const GAMES: GameMeta[] = [
   { id: "spiegel", title: "Spiegelbeeld", subject: "Denken", tone: "denken", blurb: "De linkerkant staat. Tik de rechterkant tot hij spiegelt. Vorm, as, klaar.", learns: "Spiegelen en ruimtelijk inzicht", mission: "Maak het spiegelbeeld af", minutes: "5–8 min", ages: "4–10", free: false, kerndoel: "Kerndoel rekenen 32" },
   { id: "zin", title: "Zinbouw", subject: "Taal", tone: "taal", blurb: "Tik de woorden in de goede volgorde. Wie, wat, waar — tot de zin klopt.", learns: "Zinsbouw en woordvolgorde", mission: "Bouw de zin tot hij loopt", minutes: "6–10 min", ages: "5–12", free: false, kerndoel: "Kerndoelen Nederlands 6–8" },
   { id: "regen", title: "Getallenregen", subject: "Rekenen", tone: "rekenen", blurb: "Getallen vallen. Tik het goede voor hij de grond raakt. Snel kijken, dan tikken.", learns: "Getalherkenning onder tijd", mission: "Vang het getal uit de regen", minutes: "4–7 min", ages: "4–10", free: true, kerndoel: "Kerndoel rekenen 1–4" },
+  { id: "ballon", title: "Ballonvang", subject: "Rekenen", tone: "rekenen", blurb: "Ballonnen stijgen. Tik het goede getal voor hij weg is. Kijken, dan prikken.", learns: "Getalherkenning en reactie", mission: "Prik de goede ballon", minutes: "4–7 min", ages: "4–10", free: true, kerndoel: "Kerndoel rekenen 1–4" },
+  { id: "sprint", title: "Rekensprint", subject: "Rekenen", tone: "rekenen", blurb: "De som staat vast. Antwoorden springen rond. Tik het goede voor de tijd op is.", learns: "Sommen onder tijddruk", mission: "Tik het antwoord dat beweegt", minutes: "5–8 min", ages: "6–12", free: false, kerndoel: "Kerndoel rekenen 4–5" },
 ];
 
 export const FREE_GAMES: GameId[] = GAMES.filter((g) => g.free).map((g) => g.id);
@@ -67,6 +69,7 @@ const DUTCH_COUNT: Record<number, string> = {
   22: "tweeëntwintig",
   23: "drieëntwintig",
   24: "vierentwintig",
+  25: "vijfentwintig",
 };
 
 export function dutchGameCount(cap = false): string {
