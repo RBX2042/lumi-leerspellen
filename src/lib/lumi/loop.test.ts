@@ -89,6 +89,30 @@ describe("badges", () => {
     assert.deepEqual(newBadges(["eerste"], after).filter((id) => id === "eerste"), []);
     assert.ok(newBadges(["eerste"], after).includes("perfect"));
   });
+
+  it("unlocks subject medals and gold", () => {
+    const ids = earnedBadges({
+      plays: 4,
+      perfects: 3,
+      bestCombo: 0,
+      streakDays: 0,
+      threeStars: false,
+      masteryHigh: false,
+      gamesPlayed: 4,
+      level: 2,
+      reken: 2,
+      taal: 2,
+      wereld: true,
+      aiwijs: true,
+      dapper: true,
+    });
+    assert.ok(ids.includes("rekenheld"));
+    assert.ok(ids.includes("taalster"));
+    assert.ok(ids.includes("wereldreiziger"));
+    assert.ok(ids.includes("vraagbaas"));
+    assert.ok(ids.includes("dapper"));
+    assert.ok(ids.includes("goud"));
+  });
 });
 
 describe("star track", () => {

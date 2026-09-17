@@ -23,7 +23,7 @@ export const PLANS: {
     features: [
       "1 kindprofiel",
       "3 spellen per dag",
-      "Rekenpad, Letterbos, Geheugenpad, Maaktien en Honderdveld",
+      "Rekenpad, Letterbos, Huiswerk, Vraagbaas en Klopt het?",
       "Geen reclame",
     ],
     cta: "Gratis starten",

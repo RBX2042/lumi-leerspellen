@@ -24,7 +24,8 @@ export function isPlayBoard(q: Question): boolean {
     q.kind === "mirror" ||
     q.kind === "catch" ||
     q.kind === "float" ||
-    q.kind === "dash"
+    q.kind === "dash" ||
+    q.kind === "tap"
   );
 }
 

@@ -1,7 +1,9 @@
 import type { Beat, GameId, GroupKey, Question, ShapeItem, Visual } from "./types.ts";
 import { groupIndex } from "./types.ts";
 import { defaultHint } from "./coach.ts";
+import { getHomeworkVak, homeworkGames } from "./curriculum.ts";
 import { bakken, clockSet, draai, honderd, jacht, kassa, kralen, maak10, rij, spiegel, sprong, stapel, taart, weeg, zin } from "./interact.ts";
+import { arcadeQuestion } from "./arcade-dispatch.ts";
 
 function rand(n: number): number {
   return Math.floor(Math.random() * n);
@@ -246,30 +248,31 @@ const WORLD: { prompt: string; answer: string; distractors: string[]; teach: str
 
 export const PROVINCE_LIST = PROVINCES;
 
-function uniqueChoices(correct: string, distractors: string[]): string[] {
+function uniqueChoices(correct: string, distractors: string[], need = 4): string[] {
   const unique = [correct, ...distractors.filter((d) => d !== correct)];
   let n = 1;
-  while (unique.length < 4) {
+  while (unique.length < need) {
     const extra = `${correct}-${n}`;
     if (!unique.includes(extra)) unique.push(extra);
     n += 1;
   }
-  return unique.slice(0, 4);
+  return unique.slice(0, need);
 }
 
 function choice(
   prompt: string,
   correct: string,
   distractors: string[],
-  extra?: { hint?: string; visual?: Visual; teach?: string; setup?: string; tag?: string },
+  extra?: { hint?: string; visual?: Visual; teach?: string; setup?: string; tag?: string; count?: number },
 ): Question {
-  const mixed = shuffle(uniqueChoices(correct, distractors));
+  const { count, ...rest } = extra ?? {};
+  const mixed = shuffle(uniqueChoices(correct, distractors, count ?? 4));
   return {
     kind: "choice",
     prompt,
     choices: mixed,
     answer: mixed.indexOf(correct),
-    ...extra,
+    ...rest,
   };
 }
 
@@ -377,19 +380,35 @@ function rekenpad(group: GroupKey, level: number, beat: Beat): Question {
   const op = pick(ops);
   const story = useStory(beat, group);
   if (op === "count") {
-    const n = between(1, Math.min(8, max));
-    return choice("Hoeveel lichtjes zie je?", String(n), numDistractors(n, [n + 1, Math.max(1, n - 1), n + 2]), {
-      visual: { type: "dots", count: n },
+    const n = between(1, Math.min(10, max));
+    return {
+      kind: "beads",
+      prompt: `Schuif tot ${n}`,
+      setup: "Tik een kraal. Tel mee — elk ding één getal.",
+      target: n,
+      rows: 1,
       teach: n <= 5 ? `Tel rustig, wijs mee: 1 tot ${n}. Er zijn ${n}.` : `Eerst vijf, dan nog ${n - 5}. Samen ${n}.`,
-      hint: "Wijs elk lichtje. Tel één keer. Niet twee keer hetzelfde.",
+      hint: "Wijs elk. Tel één keer. Niet twee keer hetzelfde.",
       tag: `tellen tot ${n}`,
-    });
+    };
   }
   if (op === "×") {
     const a = between(1, 10);
     const b = between(1, groupIndex(group) >= 4 ? 10 : 5);
     const ans = a * b;
     const showGroups = a <= 6 && b <= 6 && a * b <= 24;
+    if (ans <= 20) {
+      return {
+        kind: "beads",
+        prompt: `${a} × ${b} =`,
+        setup: story ? `Je hebt ${a} doosjes met ${b} knikkers.` : "Schuif tot het antwoord.",
+        target: ans,
+        rows: ans > 10 ? 2 : 1,
+        teach: timesTeach(a, b, ans),
+        hint: "Denk in groepjes. Schuif tot je ze hebt.",
+        tag: `${a} × ${b}`,
+      };
+    }
     return choice(`${a} × ${b} =`, String(ans), numDistractors(ans, [ans + a, Math.max(0, ans - a), a + b, a * (b + 1)]), {
       setup: story ? `Je hebt ${a} doosjes met ${b} knikkers.` : undefined,
       teach: timesTeach(a, b, ans),
@@ -413,6 +432,25 @@ function rekenpad(group: GroupKey, level: number, beat: Beat): Question {
   const b = between(1, op === "-" ? a : max);
   const ans = op === "+" ? a + b : a - b;
   const showParts = op === "+" && a <= 10 && b <= 10 && ans <= 14;
+  if (ans <= 20 && a <= 20) {
+    return {
+      kind: "line",
+      prompt: op === "+" ? `${a} + ${b} =` : `${a} − ${b} =`,
+      setup: story
+        ? op === "+"
+          ? `Je hebt ${a} en krijgt er ${b} bij. Tik waar je landt.`
+          : `Je hebt ${a} en geeft er ${b} weg. Tik wat overblijft.`
+        : "Tik het streepje van het antwoord.",
+      min: 0,
+      max: 20,
+      step: 1,
+      answer: ans,
+      from: a,
+      teach: op === "+" ? addTeach(a, b, ans) : subTeach(a, b, ans),
+      hint: op === "+" ? "Begin bij het grootste. Tel het kleine getal verder." : "Tel terug, of vraag: hoeveel erbij tot het eerste getal?",
+      tag: `${a} ${op} ${b}`,
+    };
+  }
   return choice(`${a} ${op} ${b} =`, String(ans), numDistractors(ans, [ans + 1, Math.max(0, ans - 1), op === "+" ? Math.abs(a - b) : a + b]), {
     setup: story
       ? op === "+"
@@ -430,29 +468,25 @@ function tafeltuin(_group: GroupKey, level: number, beat: Beat): Question {
   const table = Math.min(10, Math.max(1, 1 + ((level - 1) % 10)));
   const n = between(1, beat === "warmup" ? 5 : 10);
   const ans = table * n;
-  const mode = beat === "boss" ? 1 : level % 3;
   const row = Array.from({ length: Math.min(n, 6) }, (_, i) => table * (i + 1)).join(", ");
   const teach =
     n <= 5
       ? timesTeach(table, n, ans)
       : `Tafel van ${table}: ${row}${n > 6 ? "…" : ""}. Dus ${table} × ${n} = ${ans}. Zeg hem hardop.`;
   const hint = `Tafel van ${table}. Zeg hem op tot ${n} keer.`;
-  const visual = table <= 6 && n <= 6 && ans <= 24 ? ({ type: "groups", groups: n, size: table } as const) : undefined;
-  if (mode === 2) {
-    return choice(`Hoeveel is ${n} keer de tafel van ${table}?`, String(ans), numDistractors(ans, [table * (n + 1), table * Math.max(1, n - 1), table + n]), {
+  if (ans <= 20) {
+    return {
+      kind: "beads",
+      prompt: `${table} × ${n} =`,
+      setup: `Tafel van ${table}. Schuif tot het antwoord.`,
+      target: ans,
+      rows: ans > 10 ? 2 : 1,
       teach,
       hint,
       tag: `${table} × ${n}`,
-      visual,
-    });
+    };
   }
-  if (mode === 1) {
-    return choice(`${ans} hoort bij de tafel van ${table}. Wat ontbreekt? ${table} × ? = ${ans}`, String(n), numDistractors(n, [n + 1, Math.max(1, n - 1), table]), {
-      teach: `${table} × ${n} = ${ans}, dus het vraagteken is ${n}. Tafel achterstevoren.`,
-      hint: "Welk keer-getal hoort bij dit antwoord?",
-      tag: `${table} × ${n}`,
-    });
-  }
+  const visual = table <= 6 && n <= 6 && ans <= 24 ? ({ type: "groups", groups: n, size: table } as const) : undefined;
   return choice(`${table} × ${n} =`, String(ans), numDistractors(ans, [table * (n + 1), table * Math.max(1, n - 1), table + n]), {
     teach,
     hint,
@@ -465,54 +499,75 @@ function letterbos(group: GroupKey, _level: number, _beat: Beat): Question {
   const g = groupIndex(group);
   if (g >= 2 && Math.random() < 0.35) {
     const item = pick(RHYMES);
-    return choice(`Welk woord rijmt op “${item.word}”?`, item.rhyme, item.no, {
+    return {
+      kind: "tap",
+      prompt: `Welk woord rijmt op “${item.word}”?`,
+      options: shuffle([item.rhyme, ...item.no.slice(0, 3)]),
+      answer: item.rhyme,
       teach: `“${item.word}” en “${item.rhyme}” klinken achteraan hetzelfde. Zeg ze achter elkaar.`,
       hint: "Hou de staart van het woord vast. Welke klinkt hetzelfde?",
       tag: `rijm ${item.word}`,
-    });
+    };
   }
   const entries = Object.entries(WORDS_START);
   const [letter, words] = pick(entries);
   const word = pick(words);
-  if (g <= 2 && Math.random() < 0.5) {
-    const others = shuffle(LETTERS.filter((l) => l !== letter)).slice(0, 3);
-    const mixed = shuffle([letter, ...others]);
+  if (g <= 2 && Math.random() < 0.55) {
+    const others = shuffle(LETTERS.filter((l) => l !== letter)).slice(0, 5);
     return {
-      kind: "choice",
+      kind: "tap",
       prompt: `Welke letter hoor je vooraan in “${word}”?`,
-      choices: mixed.map((l) => l.toUpperCase()),
-      answer: mixed.indexOf(letter),
+      options: shuffle([letter, ...others]).map((l) => l.toUpperCase()),
+      answer: letter.toUpperCase(),
       teach: `Zeg het langzaam: “${word}”. Mond open, eerste klank: ${letter.toUpperCase()}.`,
       hint: "Zeg het woord in sloooow-mo. Wat komt eerst?",
       tag: `${word}`,
     };
   }
   const distractors = shuffle(entries.filter(([l]) => l !== letter)).slice(0, 3).map(([, w]) => pick(w));
-  return choice(`Welk woord begint met ${letter.toUpperCase()}?`, word, distractors, {
+  return {
+    kind: "tap",
+    prompt: `Welk woord begint met ${letter.toUpperCase()}?`,
+    options: shuffle([word, ...distractors]),
+    answer: word,
     teach: `“${word}” begint met ${letter.toUpperCase()}, de ${letter}-klank. De anderen niet.`,
     hint: "Zeg elk woord. Welke opent met dezelfde klank?",
     tag: `${letter.toUpperCase()} van ${word}`,
     visual: { type: "letter", letter: letter.toUpperCase() },
-  });
+  };
 }
 
-function woordvanger(group: GroupKey, _level: number, _beat: Beat): Question {
+function woordvanger(group: GroupKey, _level: number, beat: Beat): Question {
+  const pool = SPELLING.filter((s) => s.wrong !== s.right);
+  const item = pick(pool.length ? pool : SPELLING);
+  if (groupIndex(group) >= 3 && item.wrong !== item.right && Math.random() < 0.7) {
+    const extras = beat === "boss" ? 2 : 1;
+    const extraLetters = shuffle("aeioulnrstk".split("").filter((l) => !item.right.includes(l))).slice(0, extras);
+    return {
+      kind: "tiles",
+      prompt: "Bouw het woord goed",
+      setup: `Dit was fout: “${item.wrong}”. Tik de goede letters.`,
+      word: item.right,
+      tiles: shuffle([...item.right.split(""), ...extraLetters]),
+      teach: `Het woord is “${item.right}”. ${item.why}. Zeg “${item.right}” nog eens.`,
+      hint: `Eerste letter: ${item.right[0]!.toUpperCase()}. Regel: ${item.why}.`,
+      tag: item.right,
+    };
+  }
   if (groupIndex(group) >= 3 && Math.random() < 0.45) {
-    const item = pick(FILL);
-    const mixed = shuffle(item.options);
-    const filled = item.stem.replace("_", item.answer);
+    const fill = pick(FILL);
+    const mixed = shuffle(fill.options);
+    const filled = fill.stem.replace("_", fill.answer);
     return {
       kind: "choice",
-      prompt: `Welke letters horen in ${item.stem.replace("_", "…")}?`,
+      prompt: `Welke letters horen in ${fill.stem.replace("_", "…")}?`,
       choices: mixed,
-      answer: mixed.indexOf(item.answer),
+      answer: mixed.indexOf(fill.answer),
       hint: "Zeg het woord hardop. Rek de klank in het midden.",
-      teach: `Het woord is “${filled}”. In het midden hoor je “${item.answer}”. Zeg “${filled}” nog eens.`,
+      teach: `Het woord is “${filled}”. In het midden hoor je “${fill.answer}”. Zeg “${filled}” nog eens.`,
       tag: filled,
     };
   }
-  const pool = SPELLING.filter((s) => s.wrong !== s.right);
-  const item = pick(pool.length ? pool : SPELLING);
   if (item.wrong === item.right) {
     const other = pick(SPELLING.filter((s) => s.right !== item.right && s.wrong !== s.right));
     return choice("Welk woord is goed gespeld?", item.right, [other.wrong, other.right === other.wrong ? `${other.right}e` : other.wrong, `${item.right}t`].slice(0, 3), {
@@ -671,11 +726,20 @@ function patronen(_group: GroupKey, level: number, beat: Beat): Question {
   const step = between(1, beat === "boss" ? 4 : 3);
   const seq = [start, start + step, start + 2 * step, start + 3 * step];
   const next = start + 4 * step;
-  return choice(`Wat komt na ${seq.join(", ")}?`, String(next), numDistractors(next, [next + step, next - step, seq[3]! + 1]), {
+  const lineMax = Math.max(20, Math.ceil((next + step) / 5) * 5);
+  return {
+    kind: "line",
+    prompt: `Wat komt na ${seq.join(", ")}?`,
+    setup: "Het sprongetje blijft gelijk. Tik waar de rij landt.",
+    min: 0,
+    max: lineMax,
+    step: 1,
+    answer: next,
+    from: seq[3],
     teach: `Elke keer +${step}: ${seq.join(" → ")} → ${next}. Het verschil blijft gelijk.`,
     hint: "Trek twee buren van elkaar af. Dat sprongetje herhaalt.",
     tag: `+${step}`,
-  });
+  };
 }
 
 function geheugen(_group: GroupKey, level: number, beat: Beat): Question {
@@ -746,6 +810,169 @@ function topo(group: GroupKey, level: number, beat: Beat): Question {
   });
 }
 
+function vraagbaas(group: GroupKey, _level: number, beat: Beat): Question {
+  const g = groupIndex(group);
+  const pool =
+    g <= 2
+      ? [
+          { words: ["Teken", "drie", "katten"], extra: ["snel"] },
+          { words: ["Tel", "tot", "tien"], extra: ["hardop"] },
+          { words: ["Zeg", "het", "woord", "kat"], extra: ["misschien"] },
+          { words: ["Maak", "vijf", "stippen"], extra: ["mooi"] },
+        ]
+      : g <= 5
+        ? [
+            { words: ["Geef", "vijf", "sommen", "van", "zeven"], extra: ["leuk"] },
+            { words: ["Leg", "uit", "wat", "een", "kwart", "is"], extra: ["snel"] },
+            { words: ["Schrijf", "een", "kort", "rijmpje"], extra: ["lang"] },
+            { words: ["Noem", "drie", "provincies", "in", "het", "noorden"], extra: ["alle"] },
+          ]
+        : [
+            { words: ["Controleer", "of", "zeven", "plus", "acht", "vijftien", "is"], extra: ["misschien"] },
+            { words: ["Leg", "stap", "voor", "stap", "uit", "hoe", "je", "deelt"], extra: ["gewoon"] },
+            { words: ["Maak", "een", "rijmpje", "over", "de", "maan"], extra: ["raar"] },
+          ];
+  const item = pick(pool);
+  const extras = beat === "boss" ? item.extra : item.extra.slice(0, 1);
+  const words = item.words.map((w, i) => ({ id: `w${i}`, label: w }));
+  const extraItems = extras.map((w, i) => ({ id: `x${i}`, label: w }));
+  return {
+    kind: "order",
+    prompt: "Bouw de opdracht voor Lumi",
+    setup: "Tik op volgorde. Woorden die niks toevoegen, laat je liggen.",
+    items: shuffle([...words, ...extraItems]),
+    answer: words.map((w) => w.id),
+    teach: `De opdracht is: “${item.words.join(" ")}.” Wat, hoeveel, hoe — dan kan een helper het. Vaag blijft vaag.`,
+    hint: `Begin met “${item.words[0]}”.`,
+    tag: item.words.join(" "),
+  };
+}
+
+function klopt(group: GroupKey, _level: number, _beat: Beat): Question {
+  const g = groupIndex(group);
+  type Claim = { say: string; ok: boolean; teach: string; hint: string };
+  const easy: Claim[] = [
+    { say: "Een kat heeft vier poten.", ok: true, teach: "Dat klopt. Jij wist het al — daarom check je, je gokt niet.", hint: "Tel de poten van een kat." },
+    { say: "Twee plus twee is vijf.", ok: false, teach: "Nee. 2 + 2 = 4. Lumi klonk zeker, maar zat ernaast. Jij rekent na.", hint: "Tel op je vingers: 2 en dan 2 erbij." },
+    { say: "Een fiets heeft meestal twee wielen.", ok: true, teach: "Ja. Twee wielen. Een driewieler is de uitzondering.", hint: "Kijk naar een gewone fiets." },
+    { say: "Water is droog.", ok: false, teach: "Water is nat. Als het klinkt raar, check het met wat je al weet.", hint: "Wat voel je als je water aanraakt?" },
+    { say: "De zon komt op in het oosten.", ok: true, teach: "Ja. Oost is waar de zon opkomt. Dat onthoud je, dat check je.", hint: "Ochtendzon: welke kant?" },
+  ];
+  const mid: Claim[] = [
+    { say: "Nederland heeft twaalf provincies.", ok: true, teach: "Ja, twaalf. Lumi kan dit goed hebben — en jij weet waarom.", hint: "Tel de provincies die je kent." },
+    { say: "Acht keer zeven is vierenvijftig.", ok: false, teach: "Nee. 8 × 7 = 56. Een machine kan een som fout hebben en tóch zeker klinken.", hint: "Tafel van 8: 8 × 7." },
+    { say: "Amsterdam is de hoofdstad van Nederland.", ok: true, teach: "Ja. Den Haag is de regering, Amsterdam de hoofdstad.", hint: "Hoofdstad, niet de stad van de ministers." },
+    { say: "In ijsje schrijf je ei.", ok: false, teach: "IJsje heeft ij. Spelling check je, je neemt hem niet over.", hint: "IJs, ijsje: welke twee letters?" },
+    { say: "Een kwart is hetzelfde als 1 van de 4 stukken.", ok: true, teach: "Ja. 1/4. Jij ziet het, daarna zeg je het.", hint: "Taart in vier. Eén stuk." },
+  ];
+  const hard: Claim[] = [
+    { say: "Limburg ligt in het zuiden van Nederland.", ok: true, teach: "Ja. Zuid is onderaan de kaart. Vorm + ligging, niet alleen de naam.", hint: "Kijk naar de punt onderaan de kaart." },
+    { say: "Een half plus een kwart is een derde.", ok: false, teach: "Nee. 1/2 + 1/4 = 3/4. Lumi kan breuken verknoeien. Jij rekent in stukken.", hint: "Twee kwart plus één kwart." },
+    { say: "Je schrijft: hij word moe.", ok: false, teach: "Hij wordt, met t. Stam + t. Neem spelling niet over van een machine.", hint: "Hij / zij / het: stam plus t." },
+    { say: "De Rijn mondt uit in de Noordzee.", ok: true, teach: "Ja. Grote rivieren naar zee. Check met een kaart als je twijfelt.", hint: "Welke zee ligt west van Nederland?" },
+    { say: "Drie achtste is meer dan een half.", ok: false, teach: "3/8 is minder dan 4/8. Een half is 4/8. Jij vergelijkt, Lumi gokt soms.", hint: "Een half is vier achtste." },
+  ];
+  const pool = g <= 2 ? easy : g <= 5 ? mid : hard;
+  const c = pick(pool);
+  const correct = c.ok ? "Klopt" : "Klopt niet";
+  return choice(`Lumi zegt: “${c.say}”`, correct, c.ok ? ["Klopt niet"] : ["Klopt"], {
+    setup: "Jij blijft de baas. Klinkt het zeker? Check het toch.",
+    teach: c.teach,
+    hint: c.hint,
+    tag: c.ok ? "waar" : "ernaast",
+    count: 2,
+  });
+}
+
+function opdracht(group: GroupKey, _level: number, _beat: Beat): Question {
+  const g = groupIndex(group);
+  type Item = { want: string; good: string; bad: string[]; teach: string; hint: string };
+  const easy: Item[] = [
+    {
+      want: "Je wilt drie katten op papier.",
+      good: "Teken drie katten.",
+      bad: ["Doe iets leuks."],
+      teach: "Zeg wat en hoeveel. ‘Iets leuks’ kan van alles zijn — drie katten niet.",
+      hint: "Welke zin zegt precies wat er op papier moet?",
+    },
+    {
+      want: "Je wilt tot tien tellen.",
+      good: "Tel tot tien.",
+      bad: ["Help me."],
+      teach: "‘Help me’ is vaag. ‘Tel tot tien’ kan een helper wél doen.",
+      hint: "Welke opdracht heeft een einde?",
+    },
+    {
+      want: "Je wilt het woord kat horen.",
+      good: "Zeg het woord kat.",
+      bad: ["Praat maar."],
+      teach: "Een helper praat eindeloos als je niet zegt welk woord.",
+      hint: "Welk woord moet er klinken?",
+    },
+  ];
+  const mid: Item[] = [
+    {
+      want: "Je wilt de tafel van 6 oefenen.",
+      good: "Geef vijf sommen van de tafel van 6.",
+      bad: ["Help met rekenen.", "Doe tafels."],
+      teach: "Vijf sommen, tafel van 6. Hoeveel + wat. Anders krijg je willekeur.",
+      hint: "Welke opdracht noemt de tafel én hoeveel sommen?",
+    },
+    {
+      want: "Je snapt een kwart niet.",
+      good: "Leg uit wat een kwart is, met een taart.",
+      bad: ["Leg breuken uit.", "Zeg iets slims."],
+      teach: "Eén begrip, één plaatje. ‘Breuken’ is te groot — een kind raakt kwijt.",
+      hint: "Welke opdracht is klein genoeg om te begrijpen?",
+    },
+    {
+      want: "Je wilt weten of 7+8 klopt.",
+      good: "Is 7 + 8 gelijk aan 15? Reken het na.",
+      bad: ["Reken maar.", "Klopt dit?"],
+      teach: "Zeg de som. ‘Reken maar’ heeft geen getal — dan gokt de helper.",
+      hint: "Staat de som in de opdracht?",
+    },
+  ];
+  const hard: Item[] = [
+    {
+      want: "Je wilt een rijmpje over de maan, kort.",
+      good: "Maak een rijmpje van vier regels over de maan.",
+      bad: ["Schrijf een gedicht.", "Wees creatief."],
+      teach: "Vorm + onderwerp. ‘Wees creatief’ is geen opdracht, het is een zucht.",
+      hint: "Welke zin noemt lengte én onderwerp?",
+    },
+    {
+      want: "Je wilt controleren of een zin goed is.",
+      good: "Klopt de zin ‘Hij wordt moe’? Leg de d/t-regel uit.",
+      bad: ["Check mijn Nederlands.", "Is dit goed?"],
+      teach: "Geef de zin mee. Zonder zin kan niemand de regel toepassen.",
+      hint: "Staat de zin die gecheckt moet worden erin?",
+    },
+    {
+      want: "Je wilt drie noordelijke provincies.",
+      good: "Noem drie provincies in het noorden van Nederland.",
+      bad: ["Vertel over Nederland.", "Topo, please."],
+      teach: "Hoeveel, waar, wat. Anders krijg je een verhaal in plaats van een lijst.",
+      hint: "Welke opdracht vraagt om een lijst, niet om een verhaal?",
+    },
+  ];
+  const pool = g <= 2 ? easy : g <= 5 ? mid : hard;
+  const item = pick(pool);
+  return choice(item.want, item.good, item.bad, {
+    setup: "Welke opdracht zou jij een helper geven?",
+    teach: item.teach,
+    hint: item.hint,
+    tag: "specifiek",
+    count: 1 + item.bad.length,
+  });
+}
+
+function homeworkQuestion(group: GroupKey, level: number, beat: Beat): Question {
+  const games = homeworkGames(group, getHomeworkVak()).filter((id) => id !== "huiswerk");
+  const pool: GameId[] = games.length ? games : ["rekenpad", "letterbos", "klopt"];
+  return makeQuestion(pick(pool), group, level, beat);
+}
+
 export function makeQuestion(gameId: GameId, group: GroupKey, level: number, beat: Beat = "core"): Question {
   let q: Question;
   switch (gameId) {
@@ -814,6 +1041,23 @@ export function makeQuestion(gameId: GameId, group: GroupKey, level: number, bea
       break;
     case "zin":
       q = zin(group, level, beat);
+      break;
+    case "regen":
+    case "ballon":
+    case "sprint":
+      q = arcadeQuestion(gameId, group, level, beat);
+      break;
+    case "vraagbaas":
+      q = vraagbaas(group, level, beat);
+      break;
+    case "klopt":
+      q = klopt(group, level, beat);
+      break;
+    case "opdracht":
+      q = opdracht(group, level, beat);
+      break;
+    case "huiswerk":
+      q = homeworkQuestion(group, level, beat);
       break;
   }
   return withHint(q, defaultHint(gameId));

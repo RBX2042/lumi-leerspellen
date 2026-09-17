@@ -11,8 +11,9 @@ function Over() {
     <LegalPage kicker="Over" title={`${BRAND.name} — ${BRAND.tagline}`}>
       <p>
         {BRAND.name} is een Nederlandse leerapp voor groep 1 tot 8. {dutchGameCount(true)} korte spellen: rekenen,
-        tafels, letters, spelling, klokkijken, geld, breuken, zinnen, patronen, werkgeheugen en topografie. Geen reclame,
-        geen chat, geen beloningswinkel.
+        tafels, letters, spelling, klokkijken, geld, breuken, zinnen, patronen, werkgeheugen, topografie — en AI-wijs.
+        Geen reclame, geen chatbot, geen beloningswinkel. Wel de gewoonte om te checken en een machine een duidelijke
+        opdracht te geven, zodat een kind vooruit is als de klas later wél met AI werkt.
       </p>
       <h2>Voor wie</h2>
       <p>

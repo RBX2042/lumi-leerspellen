@@ -1,4 +1,5 @@
-import type { ChildProgress, Skill } from "./types";
+import type { ChildProgress, GameId, Skill } from "./types";
+import { GAMES } from "./catalog.ts";
 import { dayKey, shiftDay } from "./day.ts";
 
 export type BadgeId =
@@ -11,30 +12,92 @@ export type BadgeId =
   | "sterren3"
   | "meester"
   | "ontdekker"
-  | "groei";
+  | "groei"
+  | "rekenheld"
+  | "taalster"
+  | "wereldreiziger"
+  | "vraagbaas"
+  | "dapper"
+  | "goud";
 
 export interface BadgeDef {
   id: BadgeId;
   title: string;
   how: string;
+  art: string;
+  titles: Record<BadgeWorld, string>;
+}
+
+export type BadgeWorld = "ster" | "kampioen" | "bos";
+
+export const WORLDS: { id: BadgeWorld; label: string; blurb: string }[] = [
+  { id: "ster", label: "Sterren", blurb: "Goud en glans. Een ster op je borst." },
+  { id: "kampioen", label: "Kampioen", blurb: "Schild en beker. Jij wint de ronde." },
+  { id: "bos", label: "Bos", blurb: "Uil en eikel. Het licht in het hout." },
+];
+
+function medal(file: string): string {
+  return `/art/badges/${file}.jpg`;
+}
+
+function names(ster: string, kampioen: string, bos: string): Record<BadgeWorld, string> {
+  return { ster, kampioen, bos };
 }
 
 export const BADGES: BadgeDef[] = [
-  { id: "eerste", title: "Eerste ronde", how: "Je eerste ronde is binnen." },
-  { id: "perfect", title: "Alles goed", how: "Een ronde zonder misser." },
-  { id: "combo5", title: "Vijf op rij", how: "Vijf antwoorden achter elkaar." },
-  { id: "combo8", title: "In de flow", how: "Acht goed op rij." },
-  { id: "dagen3", title: "Gewoonte", how: "Drie dagen achter elkaar." },
-  { id: "dagen7", title: "Een week", how: "Zeven dagen op rij." },
-  { id: "sterren3", title: "Drie sterren", how: "Negentig procent of meer." },
-  { id: "meester", title: "Het zit vast", how: "Zeventig procent vast in een spel." },
-  { id: "ontdekker", title: "Ontdekker", how: "Vier verschillende spellen." },
-  { id: "groei", title: "Niveau vijf", how: "Kindniveau 5 bereikt." },
+  { id: "eerste", title: "Eerste ronde", how: "Je eerste ronde is binnen.", art: medal("bloesem"), titles: names("Eerste ster", "Eerste beker", "Eerste ronde") },
+  { id: "perfect", title: "Alles goed", how: "Een ronde zonder misser.", art: medal("ster"), titles: names("Stralend", "Perfecte ronde", "Alles goed") },
+  { id: "combo5", title: "Vijf op rij", how: "Vijf antwoorden achter elkaar.", art: medal("bliksem"), titles: names("Vijf sterren", "Vijf op rij", "Vijf op rij") },
+  { id: "combo8", title: "In de flow", how: "Acht goed op rij.", art: medal("bliksem"), titles: names("In de glans", "In de flow", "In de flow") },
+  { id: "dagen3", title: "Gewoonte", how: "Drie dagen achter elkaar.", art: medal("uil"), titles: names("Drie dagen glans", "Driedaagse", "Gewoonte") },
+  { id: "dagen7", title: "Een week", how: "Zeven dagen op rij.", art: medal("kroon"), titles: names("Weekster", "Weekkampioen", "Een week") },
+  { id: "sterren3", title: "Drie sterren", how: "Negentig procent of meer.", art: medal("ster"), titles: names("Drie sterren", "Gouden drie", "Drie sterren") },
+  { id: "meester", title: "Het zit vast", how: "Zeventig procent vast in een spel.", art: medal("kroon"), titles: names("Meesterster", "Meester", "Het zit vast") },
+  { id: "ontdekker", title: "Ontdekker", how: "Vier verschillende spellen.", art: medal("kompas"), titles: names("Ontdekster", "Ontdekkingsreiziger", "Ontdekker") },
+  { id: "groei", title: "Niveau vijf", how: "Kindniveau 5 bereikt.", art: medal("uil"), titles: names("Groeister", "Niveau vijf", "Niveau vijf") },
+  { id: "rekenheld", title: "Rekenheld", how: "Twee rekenspellen goed op weg.", art: medal("ster"), titles: names("Rekenster", "Rekenkampioen", "Rekenvos") },
+  { id: "taalster", title: "Taalster", how: "Twee taalspellen goed op weg.", art: medal("boek"), titles: names("Taalster", "Woordkampioen", "Letteruil") },
+  { id: "wereldreiziger", title: "Wereldreiziger", how: "Topo gespeeld. De kaart zit.", art: medal("kompas"), titles: names("Wereldster", "Wereldkampioen", "Kaartuil") },
+  { id: "vraagbaas", title: "Vraagbaas", how: "AI-wijs gespeeld. Jij blijft de baas.", art: medal("uil"), titles: names("Vraagster", "Baas van de machine", "Wijze uil") },
+  { id: "dapper", title: "Dapper", how: "Doorzetten na een misser.", art: medal("schild"), titles: names("Dapper hart", "Niet opgeven", "Weer opstaan") },
+  { id: "goud", title: "Goud", how: "Drie perfecte rondes.", art: medal("kroon"), titles: names("Gouden kroon", "Gouden beker", "Gouden eikel") },
 ];
 
 export const BADGE_BY_ID: Record<BadgeId, BadgeDef> = Object.fromEntries(
   BADGES.map((b) => [b.id, b]),
 ) as Record<BadgeId, BadgeDef>;
+
+export function badgeTitle(id: BadgeId, world: BadgeWorld = "bos"): string {
+  return BADGE_BY_ID[id].titles[world];
+}
+
+const WORLD_PREFIX = "lumi.world.";
+
+export function defaultWorld(avatar: string): BadgeWorld {
+  if (avatar === "ster" || avatar === "haas" || avatar === "hert") return "ster";
+  if (avatar === "leeuw" || avatar === "beer" || avatar === "vos") return "kampioen";
+  return "bos";
+}
+
+export function loadWorld(childId: number, avatar?: string): BadgeWorld {
+  if (typeof window === "undefined") return defaultWorld(avatar ?? "uil");
+  try {
+    const raw = window.localStorage.getItem(WORLD_PREFIX + childId);
+    if (raw === "ster" || raw === "kampioen" || raw === "bos") return raw;
+  } catch {
+    /* ignore */
+  }
+  return defaultWorld(avatar ?? "uil");
+}
+
+export function saveWorld(childId: number, world: BadgeWorld): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(WORLD_PREFIX + childId, world);
+  } catch {
+    /* ignore */
+  }
+}
 
 export interface LevelInfo {
   level: number;
@@ -142,6 +205,11 @@ export interface BadgeInput {
   masteryHigh: boolean;
   gamesPlayed: number;
   level: number;
+  reken?: number;
+  taal?: number;
+  wereld?: boolean;
+  aiwijs?: boolean;
+  dapper?: boolean;
 }
 
 export function earnedBadges(input: BadgeInput): BadgeId[] {
@@ -156,7 +224,18 @@ export function earnedBadges(input: BadgeInput): BadgeId[] {
   if (input.masteryHigh) out.push("meester");
   if (input.gamesPlayed >= 4) out.push("ontdekker");
   if (input.level >= 5) out.push("groei");
+  if ((input.reken ?? 0) >= 2) out.push("rekenheld");
+  if ((input.taal ?? 0) >= 2) out.push("taalster");
+  if (input.wereld) out.push("wereldreiziger");
+  if (input.aiwijs) out.push("vraagbaas");
+  if (input.dapper) out.push("dapper");
+  if (input.perfects >= 3) out.push("goud");
   return out;
+}
+
+function toneCount(skills: Skill[] | undefined, tone: string): number {
+  const ids = new Set(GAMES.filter((g) => g.tone === tone).map((g) => g.id as GameId));
+  return (skills ?? []).filter((s) => ids.has(s.gameId) && s.attempts > 0 && s.mastery >= 40).length;
 }
 
 export function badgesFromProgress(
@@ -166,6 +245,7 @@ export function badgesFromProgress(
 ): BadgeId[] {
   const p = progress ?? { xp: 0, plays: 0, perfects: 0, gamesPlayed: 0, days: [] };
   const bestSkillCombo = Math.max(0, ...(skills ?? []).map((s) => s.bestStreak));
+  const played = new Set((skills ?? []).filter((s) => s.attempts > 0).map((s) => s.gameId));
   return earnedBadges({
     plays: p.plays,
     perfects: p.perfects,
@@ -175,6 +255,11 @@ export function badgesFromProgress(
     masteryHigh: (skills ?? []).some((s) => s.mastery >= 70),
     gamesPlayed: p.gamesPlayed,
     level: levelFromXp(p.xp).level,
+    reken: toneCount(skills, "rekenen"),
+    taal: toneCount(skills, "taal"),
+    wereld: played.has("topo"),
+    aiwijs: ["vraagbaas", "klopt", "opdracht"].some((id) => played.has(id as GameId)),
+    dapper: (skills ?? []).some((s) => s.attempts >= 8 && s.correct < s.attempts),
   });
 }
 

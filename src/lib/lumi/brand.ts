@@ -1,7 +1,9 @@
 export const BRAND = {
   name: "Lumi",
   tagline: "Leren dat blijft zitten",
-  claim: "Schermtijd waar een kind écht van leert.",
+  slogan: "Niet nappraten. Vooruitdenken.",
+  claim: "Schermtijd waar een kind écht van leert — en de baas blijft.",
+  line: "Rekenen. Taal. AI-wijs.",
   category: "Leerspellen voor groep 1 tot 8",
   pronunciation: "LOE-mie",
   domainHint: "lumi",

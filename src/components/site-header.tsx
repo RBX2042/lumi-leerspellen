@@ -13,28 +13,34 @@ export function SiteHeader({ dim = false }: { dim?: boolean }) {
     <header
       className={
         dim
-          ? "lumi-glass sticky top-0 z-30 border-b border-border/70 pt-[env(safe-area-inset-top)]"
-          : "lumi-glass sticky top-0 z-30 border-b border-border/70 pt-[env(safe-area-inset-top)]"
+          ? "sticky top-0 z-30 border-b border-border bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur-sm"
+          : "sticky top-0 z-30 border-b border-border bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur-sm"
       }
     >
-      <div className="mx-auto flex h-[4.35rem] max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4">
+      <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4">
         <Link to="/" className="shrink-0" aria-label={BRAND.name} onClick={() => setOpen(false)}>
           <LumiWordmark />
         </Link>
         <nav className="hidden items-center gap-7 text-sm text-muted md:flex">
-          <Link to="/" hash="spellen" className="transition-colors hover:text-ink">
+          <Link to="/" hash="spellen" className="hover:text-ink">
             Spellen
           </Link>
-          <Link to="/prijzen" className="transition-colors hover:text-ink">
+          <Link to="/" hash="aiwijs" className="hover:text-ink">
+            AI-wijs
+          </Link>
+          <Link to="/huiswerk" className="hover:text-ink">
+            Huiswerk
+          </Link>
+          <Link to="/prijzen" className="hover:text-ink">
             Prijzen
           </Link>
-          <Link to="/school" className="transition-colors hover:text-ink">
+          <Link to="/school" className="hover:text-ink">
             Voor school
           </Link>
-          <Link to="/over" className="transition-colors hover:text-ink">
+          <Link to="/over" className="hover:text-ink">
             Over
           </Link>
-          <Link to="/hulp" className="transition-colors hover:text-ink">
+          <Link to="/hulp" className="hover:text-ink">
             Hulp
           </Link>
         </nav>
@@ -70,7 +76,8 @@ export function SiteHeader({ dim = false }: { dim?: boolean }) {
                 search={{ next: "/ouders" }}
                 className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-primary px-3 text-sm font-medium text-primary-fg shadow-[0_10px_22px_-12px_color-mix(in_oklab,var(--color-primary)_70%,transparent)] sm:px-4"
               >
-                7 dagen gratis
+                <span className="sm:hidden">Gratis</span>
+                <span className="hidden sm:inline">7 dagen gratis</span>
               </Link>
             </>
           )}
@@ -85,9 +92,15 @@ export function SiteHeader({ dim = false }: { dim?: boolean }) {
         </div>
       </div>
       {open ? (
-        <nav className="grid gap-1 border-t border-border bg-surface/90 px-4 py-3 text-sm backdrop-blur-xl md:hidden">
+        <nav className="grid gap-1 border-t border-border px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-sm md:hidden">
           <Link to="/" hash="spellen" className="flex h-11 items-center" onClick={() => setOpen(false)}>
             Spellen
+          </Link>
+          <Link to="/" hash="aiwijs" className="flex h-11 items-center" onClick={() => setOpen(false)}>
+            AI-wijs
+          </Link>
+          <Link to="/huiswerk" className="flex h-11 items-center" onClick={() => setOpen(false)}>
+            Huiswerk
           </Link>
           <Link to="/prijzen" className="flex h-11 items-center" onClick={() => setOpen(false)}>
             Prijzen

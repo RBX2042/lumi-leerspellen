@@ -8,8 +8,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-fg shadow-[0_1px_0_color-mix(in_oklab,#fff_22%,transparent)_inset,0_10px_22px_-12px_color-mix(in_oklab,var(--color-primary)_70%,transparent)] hover:bg-primary/90",
+        default: "bg-primary text-primary-fg shadow-[0_10px_22px_-12px_color-mix(in_oklab,var(--color-primary)_70%,transparent)] hover:bg-primary/90",
         secondary:
           "bg-surface text-ink shadow-[var(--shadow-card)] hover:bg-surface-2",
         outline:

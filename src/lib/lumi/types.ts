@@ -36,11 +36,15 @@ export const GAME_ID_LIST = [
   "regen",
   "ballon",
   "sprint",
+  "vraagbaas",
+  "klopt",
+  "opdracht",
+  "huiswerk",
 ] as const;
 
 export type GameId = (typeof GAME_ID_LIST)[number];
 
-export type AvatarId = "uil" | "vos" | "beer" | "haas" | "hert" | "egel";
+export type AvatarId = "uil" | "vos" | "beer" | "haas" | "hert" | "egel" | "ster" | "leeuw";
 
 export type Beat = "warmup" | "core" | "boss";
 
@@ -314,6 +318,8 @@ export const AVATARS: { id: AvatarId; label: string }[] = [
   { id: "haas", label: "Haas" },
   { id: "hert", label: "Hert" },
   { id: "egel", label: "Egel" },
+  { id: "ster", label: "Ster" },
+  { id: "leeuw", label: "Leeuw" },
 ];
 
 export function groupFromAge(age: number): GroupKey {

@@ -1,6 +1,6 @@
-import type { GameId } from "./types.ts";
+import type { Child, GameId } from "./types.ts";
 
-export type GameTone = "rekenen" | "taal" | "denken" | "wereld";
+export type GameTone = "rekenen" | "taal" | "denken" | "wereld" | "ai";
 
 export interface GameMeta {
   id: GameId;
@@ -21,6 +21,7 @@ export const TONE_BAR: Record<GameTone, string> = {
   taal: "bg-tone-taal",
   denken: "bg-tone-denken",
   wereld: "bg-tone-wereld",
+  ai: "bg-tone-ai",
 };
 
 export const TONE_TEXT: Record<GameTone, string> = {
@@ -28,7 +29,41 @@ export const TONE_TEXT: Record<GameTone, string> = {
   taal: "text-tone-taal",
   denken: "text-tone-denken",
   wereld: "text-tone-wereld",
+  ai: "text-tone-ai",
 };
+
+export const TONE_WASH: Record<GameTone, string> = {
+  rekenen: "from-tone-rekenen/18",
+  taal: "from-tone-taal/18",
+  denken: "from-tone-denken/18",
+  wereld: "from-tone-wereld/18",
+  ai: "from-tone-ai/18",
+};
+
+export const TONE_ART: Record<GameTone, string> = {
+  rekenen: "/art/tone-rekenen.jpg",
+  taal: "/art/tone-taal.jpg",
+  denken: "/art/tone-denken.jpg",
+  wereld: "/art/tone-wereld.jpg",
+  ai: "/art/tone-ai.jpg",
+};
+
+export function gameArt(id: string): string {
+  return `/art/games/${id}.jpg`;
+}
+
+export const GUEST_CHILD: Child = {
+  id: 0,
+  userId: "guest",
+  name: "Jij",
+  age: 8,
+  groupKey: "groep4",
+  avatar: "uil",
+  dailyMinutes: 20,
+  createdAt: "2026-01-01",
+};
+
+
 
 export const GAMES: GameMeta[] = [
   { id: "rekenpad", title: "Rekenpad", subject: "Rekenen", tone: "rekenen", blurb: "Eerst warm, dan écht, dan een test. Elke som legt uit hoe je hem doet.", learns: "Getalbegrip en bewerkingen", mission: "Reken tot het vanzelf gaat", minutes: "8–12 min", ages: "4–12", free: true, kerndoel: "Kerndoelen rekenen 1–5" },
@@ -56,6 +91,58 @@ export const GAMES: GameMeta[] = [
   { id: "regen", title: "Getallenregen", subject: "Rekenen", tone: "rekenen", blurb: "Getallen vallen. Tik het goede voor hij de grond raakt. Snel kijken, dan tikken.", learns: "Getalherkenning onder tijd", mission: "Vang het getal uit de regen", minutes: "4–7 min", ages: "4–10", free: true, kerndoel: "Kerndoel rekenen 1–4" },
   { id: "ballon", title: "Ballonvang", subject: "Rekenen", tone: "rekenen", blurb: "Ballonnen stijgen. Tik het goede getal voor hij weg is. Kijken, dan prikken.", learns: "Getalherkenning en reactie", mission: "Prik de goede ballon", minutes: "4–7 min", ages: "4–10", free: true, kerndoel: "Kerndoel rekenen 1–4" },
   { id: "sprint", title: "Rekensprint", subject: "Rekenen", tone: "rekenen", blurb: "De som staat vast. Antwoorden springen rond. Tik het goede voor de tijd op is.", learns: "Sommen onder tijddruk", mission: "Tik het antwoord dat beweegt", minutes: "5–8 min", ages: "6–12", free: false, kerndoel: "Kerndoel rekenen 4–5" },
+  {
+    id: "vraagbaas",
+    title: "Vraagbaas",
+    subject: "AI-wijs",
+    tone: "ai",
+    blurb: "Bouw een opdracht die een helper écht kan uitvoeren. Wat, hoeveel, hoe — jij stuurt.",
+    learns: "Duidelijke instructie geven",
+    mission: "Jij blijft de baas van de vraag",
+    minutes: "6–10 min",
+    ages: "5–12",
+    free: true,
+    kerndoel: "Mediawijsheid · 21e eeuwse vaardigheden",
+  },
+  {
+    id: "klopt",
+    title: "Klopt het?",
+    subject: "AI-wijs",
+    tone: "ai",
+    blurb: "Lumi klinkt zeker. Jij checkt. Een machine kan ernaast zitten — jij houdt het hoofd erbij.",
+    learns: "Antwoorden controleren",
+    mission: "Geloof niet, check",
+    minutes: "5–8 min",
+    ages: "4–12",
+    free: true,
+    kerndoel: "Mediawijsheid · kritisch denken",
+  },
+  {
+    id: "opdracht",
+    title: "Opdracht",
+    subject: "AI-wijs",
+    tone: "ai",
+    blurb: "Vaag in, vaag uit. Kies de opdracht die een helper wél verder helpt.",
+    learns: "Specifiek vragen stellen",
+    mission: "Zeg precies wat je wilt",
+    minutes: "5–8 min",
+    ages: "6–12",
+    free: false,
+    kerndoel: "Mediawijsheid · taaldoelen 6–8",
+  },
+  {
+    id: "huiswerk",
+    title: "Huiswerk",
+    subject: "Vanavond",
+    tone: "denken",
+    blurb: "Wat jouw groep nu moet kunnen. Eerst de regel, dan spelen — rekenen, taal, wereld, AI-wijs.",
+    learns: "De stof van jouw groep, in één ronde",
+    mission: "Vanavond klaar",
+    minutes: "8–12 min",
+    ages: "4–12",
+    free: true,
+    kerndoel: "Kerndoelen per groep · huiswerk dat blijft zitten",
+  },
 ];
 
 export const FREE_GAMES: GameId[] = GAMES.filter((g) => g.free).map((g) => g.id);
@@ -70,6 +157,8 @@ const DUTCH_COUNT: Record<number, string> = {
   23: "drieëntwintig",
   24: "vierentwintig",
   25: "vijfentwintig",
+  26: "zesentwintig",
+  29: "negenentwintig",
 };
 
 export function dutchGameCount(cap = false): string {

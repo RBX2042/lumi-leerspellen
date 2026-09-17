@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { LumiMark } from "@/components/lumi-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,6 +55,7 @@ function Login() {
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
   const [brokerOk, setBrokerOk] = useState(false);
 
   useEffect(() => {
@@ -100,11 +100,13 @@ function Login() {
   }
 
   return (
-    <main className="relative grid min-h-dvh place-items-center overflow-hidden bg-bg px-4 py-10">
-      <div className="pointer-events-none absolute inset-0 lumi-wash" />
-      <div className="relative w-full max-w-md rounded-3xl bg-surface p-6 shadow-[var(--shadow-lift)] sm:p-8">
-        <Link to="/" className="mb-8 flex items-center gap-2.5 text-ink">
-          <LumiMark className="size-9" />
+    <main className="relative min-h-dvh overflow-hidden bg-bg">
+      <img src="/art/hero-table.jpg" alt="" className="pointer-events-none absolute inset-0 size-full object-cover opacity-35" />
+      <div className="absolute inset-0 bg-bg/70" />
+      <div className="relative grid min-h-dvh place-items-center px-4 py-10">
+      <div className="w-full max-w-md rounded-3xl bg-surface p-6 shadow-[var(--shadow-lift)] sm:p-8">
+        <Link to="/" className="mb-8 flex items-center gap-3 text-ink">
+          <img src="/art/owl-square.jpg" alt="" className="size-10 rounded-xl object-cover" />
           <span className="font-display text-2xl font-medium">Lumi</span>
         </Link>
         <h1 className="font-display text-3xl font-medium tracking-tight">
@@ -113,6 +115,7 @@ function Login() {
         <p className="mt-2 text-sm text-muted">
           Kinderen spelen. Jij ziet wat ze leren. Geen reclame, geen account voor het kind.
         </p>
+
         {authEnabled && brokerOk ? (
           <div className="mt-6 grid gap-2">
             {GROK_PROVIDERS.map((p) => (
@@ -134,6 +137,7 @@ function Login() {
             ))}
           </div>
         ) : null}
+
         {authEnabled && brokerOk ? (
         <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-wider text-faint">
           <span className="h-px flex-1 bg-border" />
@@ -143,28 +147,60 @@ function Login() {
         ) : (
           <div className="mt-6" />
         )}
+
         <form onSubmit={onSubmit} className="grid gap-4">
           {mode === "up" ? (
             <div className="grid gap-1.5">
               <Label htmlFor="name">Jouw naam</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+              />
             </div>
           ) : null}
           <div className="grid gap-1.5">
             <Label htmlFor="email">E-mail</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+            <Input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+            />
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="password">Wachtwoord</Label>
-            <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "up" ? "new-password" : "current-password"} />
+            <Input
+              id="password"
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={mode === "up" ? "new-password" : "current-password"}
+            />
           </div>
           {mode === "up" ? (
             <label className="flex items-start gap-3 text-sm text-muted">
-              <input type="checkbox" className="mt-1 size-4 accent-[var(--color-primary)]" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
+              <input
+                type="checkbox"
+                className="mt-1 size-4 accent-[var(--color-primary)]"
+                checked={agree}
+                onChange={(e) => setAgree(e.target.checked)}
+              />
               <span>
                 Ik ben 18 jaar of ouder (ouder, voogd of leerkracht) en ga akkoord met de{" "}
-                <Link to="/voorwaarden" className="text-ink underline">voorwaarden</Link>{" "}en{" "}
-                <Link to="/privacy" className="text-ink underline">privacy</Link>.
+                <Link to="/voorwaarden" className="text-ink underline">
+                  voorwaarden
+                </Link>{" "}
+                en{" "}
+                <Link to="/privacy" className="text-ink underline">
+                  privacy
+                </Link>
+                .
               </span>
             </label>
           ) : null}
@@ -173,9 +209,15 @@ function Login() {
             {busy ? "Even geduld…" : mode === "up" ? "Account maken" : "Inloggen"}
           </Button>
         </form>
-        <button type="button" className="mt-4 text-sm text-muted hover:text-ink" onClick={() => setMode(mode === "up" ? "in" : "up")}>
+
+        <button
+          type="button"
+          className="mt-4 text-sm text-muted hover:text-ink"
+          onClick={() => setMode(mode === "up" ? "in" : "up")}
+        >
           {mode === "up" ? "Heb je al een account? Inloggen" : "Nog geen account? Maak er een"}
         </button>
+      </div>
       </div>
     </main>
   );

@@ -1,5 +1,6 @@
-import { Award, Flame, Hexagon, Sparkles, Star, Target, Trophy, Zap } from "lucide-react";
-import { BADGE_BY_ID, type BadgeId, type LevelInfo, type WeekDot } from "@/lib/lumi/loop";
+import { Award, Flame, Hexagon, Sparkles, Star, Target, Trophy, Zap, BookOpen, Compass, Shield, Crown } from "lucide-react";
+import { BADGE_BY_ID, badgeTitle, type BadgeId, type BadgeWorld, type LevelInfo, type WeekDot } from "@/lib/lumi/loop";
+import { levelTitle, questSlots, roundMark } from "@/lib/lumi/rewards";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<BadgeId, typeof Star> = {
@@ -13,6 +14,12 @@ const ICONS: Record<BadgeId, typeof Star> = {
   meester: Award,
   ontdekker: Hexagon,
   groei: Trophy,
+  rekenheld: Star,
+  taalster: BookOpen,
+  wereldreiziger: Compass,
+  vraagbaas: Sparkles,
+  dapper: Shield,
+  goud: Crown,
 };
 
 export function StreakRing({
@@ -70,11 +77,20 @@ export function WeekStrip({ dots }: { dots: WeekDot[] }) {
   );
 }
 
-export function XpBar({ info, className }: { info: LevelInfo; className?: string }) {
+export function XpBar({
+  info,
+  className,
+  world,
+}: {
+  info: LevelInfo;
+  className?: string;
+  world?: BadgeWorld;
+}) {
+  const title = world ? levelTitle(info.level, world) : `Niveau ${info.level}`;
   return (
     <div className={className}>
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-sm font-medium">Niveau {info.level}</p>
+        <p className="text-sm font-medium">{title}</p>
         <p className="text-xs tabular-nums text-muted">
           {info.into}/{info.need} XP
         </p>
@@ -85,37 +101,54 @@ export function XpBar({ info, className }: { info: LevelInfo; className?: string
           style={{ width: `${info.pct}%` }}
         />
       </div>
-      <p className="mt-1 text-xs text-faint">Nog {Math.max(0, info.need - info.into)} XP tot niveau {info.level + 1}</p>
+      <p className="mt-1 text-xs text-faint">Nog {Math.max(0, info.need - info.into)} XP tot {world ? levelTitle(info.level + 1, world) : `niveau ${info.level + 1}`}</p>
     </div>
   );
 }
 
-export function BadgeMark({ id, size = 36, lit = true }: { id: BadgeId; size?: number; lit?: boolean }) {
+export function BadgeMark({
+  id,
+  size = 36,
+  lit = true,
+  world = "bos",
+}: {
+  id: BadgeId;
+  size?: number;
+  lit?: boolean;
+  world?: BadgeWorld;
+}) {
   const Icon = ICONS[id];
   const meta = BADGE_BY_ID[id];
+  const title = badgeTitle(id, world);
   return (
     <span
       className={cn(
-        "inline-grid place-items-center rounded-full",
-        lit ? "bg-primary text-primary-fg" : "bg-surface-2 text-faint",
+        "inline-grid place-items-center overflow-hidden rounded-full",
+        lit ? "bg-primary text-primary-fg shadow-[var(--shadow-card)]" : "bg-surface-2 text-faint",
+        world === "ster" && lit && "ring-2 ring-primary/50",
+        world === "kampioen" && lit && "ring-2 ring-ink/30",
       )}
       style={{ width: size, height: size }}
-      title={meta.title}
-      aria-label={meta.title}
+      title={title}
+      aria-label={title}
     >
-      <Icon style={{ width: size * 0.46, height: size * 0.46 }} />
+      {lit ? (
+        <img src={meta.art} alt="" width={size} height={size} className="size-full object-cover" />
+      ) : (
+        <Icon style={{ width: size * 0.46, height: size * 0.46 }} />
+      )}
     </span>
   );
 }
 
-export function BadgeRow({ ids }: { ids: BadgeId[] }) {
+export function BadgeRow({ ids, world = "bos" }: { ids: BadgeId[]; world?: BadgeWorld }) {
   if (ids.length === 0) return null;
   return (
     <ul className="flex flex-wrap gap-2">
       {ids.map((id) => (
         <li key={id} className="flex items-center gap-2 rounded-full bg-surface px-2 py-1 shadow-[var(--shadow-card)]">
-          <BadgeMark id={id} size={28} />
-          <span className="pr-1 text-xs font-medium">{BADGE_BY_ID[id].title}</span>
+          <BadgeMark id={id} size={28} world={world} />
+          <span className="pr-1 text-xs font-medium">{badgeTitle(id, world)}</span>
         </li>
       ))}
     </ul>
@@ -139,6 +172,65 @@ export function Confetti({ on }: { on: boolean }) {
           }}
         />
       ))}
+    </div>
+  );
+}
+
+export function RoundStars({ n, world = "bos" }: { n: number; world?: BadgeWorld }) {
+  const mark = roundMark(world);
+  return (
+    <div className="flex justify-center gap-3" aria-label={`${n} van 3 ${mark.many}`}>
+      {[1, 2, 3].map((i) => (
+        <img
+          key={i}
+          src={mark.art}
+          alt=""
+          width={48}
+          height={48}
+          className={cn(
+            "size-12 rounded-full object-cover shadow-[var(--shadow-card)]",
+            i <= n ? "lumi-star-in" : "opacity-25 grayscale",
+          )}
+          style={{ animationDelay: `${(i - 1) * 120}ms` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function DailyQuest({
+  done,
+  world = "bos",
+  line,
+}: {
+  done: number;
+  world?: BadgeWorld;
+  line: string;
+}) {
+  const mark = roundMark(world);
+  const slots = questSlots(done);
+  return (
+    <div>
+      <div className="flex items-center gap-3">
+        {slots.map((s) => (
+          <div key={s.kind} className="flex flex-col items-center gap-1">
+            <img
+              src={mark.art}
+              alt=""
+              width={40}
+              height={40}
+              className={cn(
+                "size-10 rounded-full object-cover shadow-[var(--shadow-card)]",
+                s.filled ? "" : "opacity-25 grayscale",
+              )}
+            />
+            <span className="text-[10px] uppercase tracking-wider text-faint">
+              {s.kind === "dag" ? "Dag" : "Bonus"}
+            </span>
+          </div>
+        ))}
+        <p className="min-w-0 flex-1 text-sm text-muted">{line}</p>
+      </div>
     </div>
   );
 }

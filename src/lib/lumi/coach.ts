@@ -1,6 +1,7 @@
 import { GAMES } from "./catalog.ts";
 import { dayKey } from "./day.ts";
-import type { Beat, GameId, PlaySession } from "./types.ts";
+import type { Beat, GameId, GroupKey, PlaySession } from "./types.ts";
+import { theoryForGame } from "./curriculum.ts";
 
 export function consecutivePlayDays(sessions: PlaySession[], childId: number, now = new Date()): number {
   const days = new Set(
@@ -110,6 +111,10 @@ const TIPS: Record<GameId, string> = {
   regen: "Kijk welk getal je zoekt. Tik alleen die. De rest laat je vallen.",
   ballon: "Zoek het getal. Prik alleen die ballon. De rest laat je stijgen.",
   sprint: "Reken de som eerst. Tik daarna het antwoord dat springt.",
+  vraagbaas: "Wat, hoeveel, hoe. Extra woordjes die niks zeggen, laat je liggen.",
+  klopt: "Klinkt het zeker? Reken of kijk toch na. Jij blijft de baas.",
+  opdracht: "De beste opdracht noemt wat, hoeveel of hoe. Vaag in, vaag uit.",
+  huiswerk: "Eerst de regel. Dan spelen. Jij blijft de baas.",
 };
 
 export function defaultHint(gameId: GameId): string {
@@ -121,10 +126,12 @@ export function briefing(
   level: number,
   name: string,
   priorTags: string[] = [],
-): { kicker: string; title: string; body: string; tip: string } {
+  group: GroupKey = "groep4",
+): { kicker: string; title: string; body: string; tip: string; theory: string } {
   const game = GAMES.find((g) => g.id === gameId);
   const prior = [...new Set(priorTags.filter(Boolean))].slice(0, 2);
   const table = Math.min(10, Math.max(1, 1 + ((level - 1) % 10)));
+  const theory = theoryForGame(gameId, group);
   const recall =
     prior.length > 0
       ? `Vorige keer: ${prior.join(" en ")}. Die komen terug — zo blijft het zitten.`
@@ -136,12 +143,15 @@ export function briefing(
             ? "Ballonnen stijgen. Prik alleen het goede getal."
             : gameId === "sprint"
               ? "De som staat stil. De antwoorden springen. Reken eerst, dan tik."
-              : (game?.mission ?? "Korte ronde. Daarna klaar.");
+              : gameId === "huiswerk"
+                ? theory.rule
+                : (game?.mission ?? "Korte ronde. Daarna klaar.");
   return {
-    kicker: game?.title ?? "Spel",
-    title: `Klaar, ${name}?`,
+    kicker: gameId === "huiswerk" ? theory.title : (game?.title ?? "Spel"),
+    title: gameId === "huiswerk" ? `Vanavond klaar, ${name}` : `Klaar, ${name}?`,
     body: `${recall} Tien vragen. De laatste twee zijn lastiger.`,
-    tip: TIPS[gameId] ?? "Denk eerst, tik daarna.",
+    tip: TIPS[gameId] ?? theory.do,
+    theory: theory.rule,
   };
 }
 
@@ -230,6 +240,10 @@ export function tomorrowHook(gameId: GameId, level: number): string {
   if (gameId === "regen") return "Morgen valt de regen weer. Kijk eerst, dan tik — niet gokken.";
   if (gameId === "ballon") return "Morgen stijgen nieuwe ballonnen. Kijk welk getal je zoekt, dan prik.";
   if (gameId === "sprint") return "Morgen weer een som die beweegt. Eerst rekenen, dan tikken.";
+  if (gameId === "vraagbaas") return "Morgen weer een opdracht. Wat, hoeveel, hoe — tot het vanzelf specifiek is.";
+  if (gameId === "klopt") return "Morgen weer checken. Lumi mag klinken, jij mag twijfelen.";
+  if (gameId === "opdracht") return "Morgen weer kiezen. De beste opdracht is klein en concreet.";
+  if (gameId === "huiswerk") return "Morgen weer de stof van jouw groep. Eerst de regel, dan spelen.";
   return `Morgen nog een ronde ${game?.title ?? "spel"}. Korte herhaling wint van lang blokken.`;
 }
 

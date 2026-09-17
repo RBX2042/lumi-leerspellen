@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import { useEffect, useState } from "react";
-import { BadgeRow, StreakRing, WeekStrip, XpBar } from "@/components/habit-bits";
+import { BadgeMark, BadgeRow, DailyQuest, StreakRing, WeekStrip, XpBar } from "@/components/habit-bits";
 import { KidAvatar } from "@/components/kid-avatar";
 import { Kicker } from "@/components/kicker";
 import { LumiMark } from "@/components/lumi-mark";
@@ -12,21 +12,29 @@ import { Card } from "@/components/ui/card";
 import { RedirectToSignIn } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { comebackLine } from "@/lib/lumi/coach";
-import { GAMES, TONE_BAR, TONE_TEXT } from "@/lib/lumi/catalog";
+import { GAMES, TONE_BAR, TONE_TEXT, gameArt } from "@/lib/lumi/catalog";
+import { CURRICULUM } from "@/lib/lumi/curriculum";
 import {
+  BADGES,
+  badgeTitle,
   badgesFromProgress,
   dailyQuest,
   emptyProgress,
   levelFromXp,
   loadHabit,
+  loadWorld,
   playedOn,
+  saveWorld,
   streakFromDays,
   weekDots,
+  WORLDS,
+  type BadgeWorld,
 } from "@/lib/lumi/loop";
 import { recommendGames } from "@/lib/lumi/path";
 import { canPlayGame } from "@/lib/lumi/pricing";
 import type { Child, GameId } from "@/lib/lumi/types";
 import { getActiveChildId, setActiveChildId, useFamily } from "@/lib/lumi/use-family";
+import { levelTitle } from "@/lib/lumi/rewards";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/spelen/")({ component: Spelen });
@@ -43,6 +51,7 @@ function KidHub() {
   const [childId, setChildId] = useState<number | null>(null);
 
   const [habitCombo, setHabitCombo] = useState(0);
+  const [world, setWorld] = useState<BadgeWorld>("bos");
 
   useEffect(() => {
     setChildId(getActiveChildId());
@@ -53,6 +62,8 @@ function KidHub() {
     const id = childId ?? data.children[0]?.id;
     if (id == null) return;
     setHabitCombo(loadHabit(id).bestCombo);
+    const kid = data.children.find((c) => c.id === id) ?? data.children[0];
+    if (kid) setWorld(loadWorld(kid.id, kid.avatar));
   }, [childId, data]);
 
   if (loading && !data) {
@@ -124,8 +135,8 @@ function KidHub() {
               {atRisk
                 ? `${days} dagen op rij staat op het spel`
                 : days > 0
-                  ? `Dag ${days} op rij · niveau ${info.level}`
-                  : `Niveau ${info.level} · ${comebackLine(days, todayDone)}`}
+                  ? `Dag ${days} op rij · ${levelTitle(info.level, world)}`
+                  : `${levelTitle(info.level, world)} · ${comebackLine(days, todayDone)}`}
             </p>
           </div>
         </div>
@@ -173,13 +184,74 @@ function KidHub() {
           <div className="mt-4">
             <WeekStrip dots={dots} />
           </div>
-          <XpBar className="mt-4" info={info} />
+          <div className="mt-4">
+            <DailyQuest done={quest.done} world={world} line={quest.line} />
+          </div>
+          <XpBar className="mt-4" info={info} world={world} />
           {badges.length > 0 ? (
             <div className="mt-4">
-              <BadgeRow ids={badges} />
+              <BadgeRow ids={badges} world={world} />
             </div>
           ) : null}
         </Card>
+
+        <Card className="mb-6 rounded-2xl p-5">
+          <Kicker>Jouw wereld</Kicker>
+          <p className="mt-1 font-display text-xl">Kies hoe je badges eruitzien</p>
+          <p className="mt-1 text-sm text-muted">Geen hokje. Wel een stijl die bij jou past.</p>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {WORLDS.map((w) => (
+              <button
+                key={w.id}
+                type="button"
+                onClick={() => {
+                  setWorld(w.id);
+                  saveWorld(child.id, w.id);
+                }}
+                className={cn(
+                  "rounded-2xl px-2 py-3 text-center text-sm",
+                  world === w.id ? "bg-primary text-primary-fg" : "bg-surface-2 text-ink",
+                )}
+              >
+                <span className="block font-display text-base">{w.label}</span>
+              </button>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-muted">{WORLDS.find((w) => w.id === world)?.blurb}</p>
+          <ul className="mt-5 grid grid-cols-4 gap-3 sm:grid-cols-8">
+            {BADGES.map((b) => {
+              const got = badges.includes(b.id);
+              return (
+                <li key={b.id} className="flex flex-col items-center gap-1 text-center">
+                  <BadgeMark id={b.id} size={44} lit={got} world={world} />
+                  <span className={cn("text-[10px] leading-tight", got ? "text-ink" : "text-faint")}>
+                    {got ? badgeTitle(b.id, world) : "?"}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+
+        {!timeUp && !capped ? (
+          <Link
+            to="/huiswerk"
+            className="mb-6 block"
+            onClick={() => setActiveChildId(child.id)}
+          >
+            <Card className="lumi-lift overflow-hidden rounded-3xl p-0">
+              <div className="relative h-28">
+                <img src="/art/games/huiswerk.jpg" alt="" className="size-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent" />
+              </div>
+              <div className="p-5 pt-2">
+                <Kicker>Huiswerk · {child.groupKey.replace("groep", "groep ")}</Kicker>
+                <p className="mt-1 font-display text-2xl">Vanavond klaar</p>
+                <p className="mt-1 text-sm text-muted">{CURRICULUM[child.groupKey].headline}</p>
+              </div>
+            </Card>
+          </Link>
+        ) : null}
 
         {timeUp || capped ? (
           <Card className="mb-6 rounded-2xl p-5">
@@ -273,20 +345,25 @@ function GameCard({
   const inner = (
     <Card
       className={cn(
-        "relative overflow-hidden rounded-2xl p-5 transition-[transform] duration-150",
-        !locked && "hover:-translate-y-0.5",
+        "relative overflow-hidden rounded-3xl p-0 transition-[transform] duration-150",
+        !locked && "lumi-lift",
       )}
     >
-      <span className={cn("absolute inset-y-0 left-0 w-1", TONE_BAR[game.tone])} />
-      <div className="flex items-start justify-between pl-2">
-        <p className={cn("text-xs font-medium uppercase tracking-wider", TONE_TEXT[game.tone])}>{game.subject}</p>
-        {locked ? <Lock className="size-4 text-faint" /> : <Badge variant="muted">{game.minutes}</Badge>}
+      <div className="relative h-32 overflow-hidden">
+        <img src={gameArt(game.id)} alt="" className="size-full object-cover" />
       </div>
-      <h2 className="mt-2 pl-2 font-display text-2xl">{game.title}</h2>
-      <p className="mt-2 pl-2 text-sm text-muted">{game.blurb}</p>
-      {mastery != null ? (
-        <p className="mt-3 pl-2 text-xs tabular-nums text-faint">{mastery}% vast</p>
-      ) : null}
+      <span className={cn("absolute inset-y-0 left-0 w-1", TONE_BAR[game.tone])} />
+      <div className="p-5">
+        <div className="flex items-start justify-between pl-1">
+          <p className={cn("text-xs font-medium uppercase tracking-wider", TONE_TEXT[game.tone])}>{game.subject}</p>
+          {locked ? <Lock className="size-4 text-faint" /> : <Badge variant="muted">{game.minutes}</Badge>}
+        </div>
+        <h2 className="mt-2 pl-1 font-display text-2xl">{game.title}</h2>
+        <p className="mt-2 pl-1 text-sm text-muted">{game.blurb}</p>
+        {mastery != null ? (
+          <p className="mt-3 pl-1 text-xs tabular-nums text-faint">{mastery}% vast</p>
+        ) : null}
+      </div>
     </Card>
   );
   if (locked) return <div className="opacity-70">{inner}</div>;

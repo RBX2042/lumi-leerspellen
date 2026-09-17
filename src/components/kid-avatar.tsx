@@ -8,6 +8,8 @@ const face: Record<AvatarId, { ear: string; body: string }> = {
   haas: { ear: "hare", body: "hare" },
   hert: { ear: "deer", body: "deer" },
   egel: { ear: "hedge", body: "hedge" },
+  ster: { ear: "star", body: "star" },
+  leeuw: { ear: "lion", body: "lion" },
 };
 
 export function KidAvatar({
@@ -86,6 +88,28 @@ export function KidAvatar({
           <ellipse cx="32" cy="40" rx="16" ry="12" fill="var(--color-muted)" />
           <circle cx="26" cy="40" r="2" fill="var(--color-ink)" />
           <circle cx="36" cy="40" r="2" fill="var(--color-ink)" />
+        </>
+      )}
+      {id === "ster" && (
+        <>
+          <path d="M32 8 L36 22 L50 22 L38 30 L42 44 L32 36 L22 44 L26 30 L14 22 L28 22 Z" fill="var(--color-primary)" />
+          <circle cx="32" cy="36" r="10" fill="var(--color-surface)" />
+          <circle cx="28" cy="35" r="1.8" fill="var(--color-ink)" />
+          <circle cx="36" cy="35" r="1.8" fill="var(--color-ink)" />
+          <path d="M29 40 Q32 43 35 40" fill="none" stroke="var(--color-clay)" strokeWidth="1.5" />
+        </>
+      )}
+      {id === "leeuw" && (
+        <>
+          <circle cx="32" cy="34" r="18" fill="var(--color-clay)" />
+          <circle cx="18" cy="22" r="6" fill="var(--color-primary)" />
+          <circle cx="46" cy="22" r="6" fill="var(--color-primary)" />
+          <circle cx="22" cy="42" r="6" fill="var(--color-primary)" />
+          <circle cx="42" cy="42" r="6" fill="var(--color-primary)" />
+          <ellipse cx="32" cy="36" rx="12" ry="11" fill="var(--color-surface)" />
+          <circle cx="27" cy="34" r="2" fill="var(--color-ink)" />
+          <circle cx="37" cy="34" r="2" fill="var(--color-ink)" />
+          <ellipse cx="32" cy="40" rx="3" ry="2" fill="var(--color-ink)" />
         </>
       )}
       <title>{face[id].body}</title>

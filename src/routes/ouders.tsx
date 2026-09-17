@@ -291,6 +291,16 @@ function Ouderzone({ name }: { name: string }) {
           />
         </section>
 
+        <Card className="mt-4 rounded-xl p-5">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-faint">Beloning</p>
+          <p className="mt-2 font-display text-2xl">Geen winkel. Vier lagen.</p>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+            Combo in de ronde. Sterren, bekers of eikels erna — in de wereld die zij kiezen. Eén ronde
+            houdt de dag vast, de tweede is bonus. Medailles in hun kast. De stof is de prijs; de rest
+            is bewijs dat het zit.
+          </p>
+        </Card>
+
         <section className="mt-10">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-2xl">Kinderen</h2>
@@ -590,7 +600,7 @@ function AddChildForm({ onDone }: { onDone: () => void }) {
           </select>
         </div>
         <div className="sm:col-span-2">
-          <Label>Dier</Label>
+          <Label>Wie ben jij</Label>
           <div className="mt-2 flex flex-wrap gap-2">
             {AVATARS.map((a) => (
               <button

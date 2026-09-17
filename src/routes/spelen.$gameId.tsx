@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { PlaySession } from "@/components/play-session";
 import { LumiMark } from "@/components/lumi-mark";
 import { Button } from "@/components/ui/button";
@@ -7,14 +8,16 @@ import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { gameById, dutchGameCount } from "@/lib/lumi/catalog";
 import { nextRecommended, recommendGames } from "@/lib/lumi/path";
 import { canPlayGame } from "@/lib/lumi/pricing";
+import { isVak, setHomeworkVak } from "@/lib/lumi/curriculum";
 import type { GameId } from "@/lib/lumi/types";
 import { getActiveChildId, useFamily } from "@/lib/lumi/use-family";
 
-type Search = { kind?: number };
+type Search = { kind?: number; vak?: string };
 
 export const Route = createFileRoute("/spelen/$gameId")({
   validateSearch: (s: Record<string, unknown>): Search => ({
     kind: typeof s.kind === "number" ? s.kind : typeof s.kind === "string" ? Number(s.kind) : undefined,
+    vak: typeof s.vak === "string" ? s.vak : undefined,
   }),
   component: GamePage,
 });
@@ -28,9 +31,12 @@ function GamePage() {
 
 function Gate() {
   const { gameId } = Route.useParams();
-  const { kind } = Route.useSearch();
+  const { kind, vak } = Route.useSearch();
   const { data, loading, error, reload } = useFamily();
   const meta = gameById(gameId);
+  useEffect(() => {
+    if (isVak(vak)) setHomeworkVak(vak);
+  }, [vak]);
 
   if (loading && !data) {
     return (

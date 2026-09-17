@@ -46,6 +46,10 @@ function Hulp() {
               a: "Ouderzone, onderaan: Download gegevens of Account verwijderen. Verwijderen is definitief.",
             },
             {
+              q: "Wat verdient mijn kind?",
+              a: "Geen munten, geen winkel. Combo in de ronde. Eén tot drie sterren (of bekers, of eikels) erna. Eén ronde per dag houdt de reeks vast. Medailles in hun kast, in de wereld die ze kiezen: Sterren, Kampioen of Bos. De stof is de beloning — de rest is bewijs.",
+            },
+            {
               q: "Werkt dit op de telefoon?",
               a: "Ja. De kind-omgeving is gemaakt voor een telefoon in de hand. Toetsen 1 tot 4 werken op een toetsenbord.",
             },

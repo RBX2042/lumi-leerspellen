@@ -18,6 +18,7 @@ export function PlayBoard({
   onSolve: (ok: boolean, picked?: string) => void;
 }) {
   if (q.kind === "pairtap") return <PairTapBoard q={q} locked={locked} onSolve={onSolve} />;
+  if (q.kind === "tap") return <TapBoard q={q} locked={locked} onSolve={onSolve} />;
   if (q.kind === "line") return <LineBoard q={q} locked={locked} onSolve={onSolve} />;
   if (q.kind === "tiles") return <TilesBoard q={q} locked={locked} onSolve={onSolve} />;
   if (q.kind === "sort") return <SortBoard q={q} locked={locked} onSolve={onSolve} />;
@@ -32,6 +33,51 @@ export function PlayBoard({
   if (q.kind === "balance") return <BalanceBoard q={q} locked={locked} onSolve={onSolve} />;
   if (q.kind === "mirror") return <MirrorBoard q={q} locked={locked} onSolve={onSolve} />;
   return null;
+}
+
+function TapBoard({
+  q,
+  locked,
+  onSolve,
+}: {
+  q: Extract<Question, { kind: "tap" }>;
+  locked: boolean;
+  onSolve: (ok: boolean, picked?: string) => void;
+}) {
+  const done = useRef(false);
+  const [picked, setPicked] = useState<string | null>(null);
+  useEffect(() => {
+    done.current = false;
+    setPicked(null);
+  }, [q.prompt, q.answer]);
+  return (
+    <div className="lumi-tiles mx-auto mt-6 grid w-full max-w-sm grid-cols-3 gap-3">
+      {q.options.map((o) => (
+        <button
+          key={o}
+          type="button"
+          disabled={locked}
+          onClick={() => {
+            if (locked || done.current) return;
+            playTap();
+            done.current = true;
+            setPicked(o);
+            window.setTimeout(() => onSolve(o === q.answer, o), 180);
+          }}
+          className={cn(
+            "lumi-block min-h-14 break-words rounded-2xl px-2 py-3 text-center font-display text-xl leading-tight sm:min-h-20 sm:text-2xl",
+            picked === o
+              ? o === q.answer
+                ? "bg-ok text-primary-fg"
+                : "bg-danger text-primary-fg"
+              : "bg-surface text-ink hover:bg-surface-2",
+          )}
+        >
+          {o}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 function PairTapBoard({
@@ -61,7 +107,7 @@ function PairTapBoard({
     }
   };
   return (
-    <div className="mx-auto mt-6 grid w-full max-w-sm grid-cols-3 gap-3">
+    <div className="lumi-tiles mx-auto mt-6 grid w-full max-w-sm grid-cols-3 gap-3">
       {q.numbers.map((n, i) => (
         <button
           key={`${n}-${i}`}
@@ -69,7 +115,7 @@ function PairTapBoard({
           disabled={locked}
           onClick={() => toggle(i)}
           className={cn(
-            "min-h-16 rounded-lg font-display text-2xl shadow-[var(--shadow-card)] transition-transform duration-150 active:scale-[0.96]",
+            "min-h-20 rounded-2xl font-display text-2xl shadow-[var(--shadow-card)] transition-transform duration-150 active:scale-[0.96]",
             sel.includes(i) ? "bg-primary text-primary-fg" : "bg-surface text-ink hover:bg-surface-2",
           )}
         >
@@ -93,30 +139,78 @@ function LineBoard({
   for (let n = q.min; n <= q.max; n += q.step) ticks.push(n);
   const start = q.from ?? q.min;
   const [at, setAt] = useState(start);
+  const atRef = useRef(start);
   const done = useRef(false);
+  const drag = useRef(false);
+  const track = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setAt(q.from ?? q.min);
+    atRef.current = q.from ?? q.min;
     done.current = false;
+    drag.current = false;
   }, [q.answer, q.from, q.min]);
+  const snap = (clientX: number) => {
+    const el = track.current;
+    if (!el) return atRef.current;
+    const r = el.getBoundingClientRect();
+    const t = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+    const raw = q.min + t * (q.max - q.min);
+    const n = Math.round(raw / q.step) * q.step;
+    return Math.min(q.max, Math.max(q.min, n));
+  };
   const pickTick = (n: number) => {
     if (locked || done.current) return;
     playTap();
+    atRef.current = n;
     setAt(n);
     done.current = true;
     window.setTimeout(() => onSolve(n === q.answer, String(n)), 280);
   };
+  const onPtr = (e: PointerEvent<HTMLDivElement>) => {
+    if (locked || done.current) return;
+    drag.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const n = snap(e.clientX);
+    atRef.current = n;
+    setAt(n);
+  };
+  const onMove = (e: PointerEvent<HTMLDivElement>) => {
+    if (!drag.current || locked || done.current) return;
+    const n = snap(e.clientX);
+    atRef.current = n;
+    setAt(n);
+  };
+  const onUp = () => {
+    if (!drag.current || locked || done.current) return;
+    drag.current = false;
+    playTap();
+    const n = atRef.current;
+    done.current = true;
+    window.setTimeout(() => onSolve(n === q.answer, String(n)), 220);
+  };
   const pct = (n: number) => ((n - q.min) / (q.max - q.min)) * 100;
   return (
-    <div className="mt-8 overflow-x-auto px-3">
-      <div className="relative mx-auto h-16 min-w-[17rem] max-w-lg">
-        <div className="absolute top-7 right-0 left-0 h-1 rounded-full bg-ink" />
+    <div className="mt-8 px-1 sm:px-3">
+      <div
+        ref={track}
+        className="relative mx-auto h-16 min-w-0 max-w-lg touch-none select-none"
+        onPointerDown={onPtr}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerCancel={onUp}
+      >
+        <div className="absolute top-7 right-0 left-0 h-1.5 rounded-full bg-ink/80" />
         {ticks.map((n) => (
           <button
             key={n}
             type="button"
             disabled={locked}
-            onClick={() => pickTick(n)}
-            className="absolute top-0 flex h-16 w-7 -translate-x-1/2 flex-col items-center justify-between"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              pickTick(n);
+            }}
+            className="absolute top-0 flex h-16 w-8 -translate-x-1/2 flex-col items-center justify-between sm:w-7"
             style={{ left: `${pct(n)}%` }}
             aria-label={String(n)}
           >
@@ -132,12 +226,12 @@ function LineBoard({
           </button>
         ))}
         <span
-          className="pointer-events-none absolute top-3 size-6 -translate-x-1/2 rounded-full bg-primary shadow-[var(--shadow-card)] transition-[left] duration-200"
-          style={{ left: `${pct(at)}%` }}
+          className="pointer-events-none absolute top-2 size-8 -translate-x-1/2 rounded-full bg-primary shadow-[var(--shadow-lift)] transition-[left] duration-150"
+          style={{ left: `${pct(at)}%`, transform: "translateX(-50%) translateZ(12px)" }}
           aria-hidden
         />
       </div>
-      <p className="mt-3 text-center text-sm text-muted">Nu op {at}</p>
+      <p className="mt-3 text-center text-sm text-muted">Sleep of tik · nu op {at}</p>
     </div>
   );
 }
@@ -199,7 +293,7 @@ function TilesBoard({
             onClick={() => pop(i)}
             className={cn(
               "grid place-items-center rounded-md bg-surface font-display shadow-[var(--shadow-card)]",
-              q.word.length >= 8 ? "size-9 text-lg" : "size-11 text-xl",
+              q.word.length >= 8 ? "lumi-block size-10 text-lg sm:size-11" : "lumi-block size-11 text-xl sm:size-12",
             )}
             aria-label={s != null ? `letter ${q.tiles[s]}, terug` : `plek ${i + 1}`}
           >
@@ -215,7 +309,7 @@ function TilesBoard({
             disabled={locked || used[i]}
             onClick={() => place(i)}
             className={cn(
-              "grid place-items-center rounded-lg font-display shadow-[var(--shadow-card)]",
+              "grid place-items-center rounded-2xl font-display shadow-[var(--shadow-card)]",
               q.word.length >= 8 ? "size-11 text-lg" : "size-12 text-xl",
               used[i] ? "bg-surface-2 text-faint" : "bg-primary text-primary-fg active:scale-[0.96]",
             )}
@@ -338,7 +432,7 @@ function SortBoard({
               setHold(it.id);
             }}
             className={cn(
-              "min-h-11 rounded-lg bg-surface px-3 py-2 text-sm font-medium shadow-[var(--shadow-card)]",
+              "min-h-11 rounded-2xl bg-surface px-3 py-2 text-sm font-medium shadow-[var(--shadow-card)]",
               hold === it.id && "bg-primary text-primary-fg",
             )}
           >
@@ -458,7 +552,7 @@ function FlipBoard({
   const cols = q.cards.length > 4 ? "1fr 1fr 1fr" : "1fr 1fr";
   return (
     <div
-      className="mx-auto mt-6 grid max-w-sm gap-3"
+      className="lumi-tiles mx-auto mt-6 grid max-w-sm gap-3"
       style={{ gridTemplateColumns: cols }}
     >
       {q.cards.map((c) => {
@@ -470,7 +564,7 @@ function FlipBoard({
             disabled={locked}
             onClick={() => flip(c.id)}
             className={cn(
-              "grid min-h-20 place-items-center rounded-lg shadow-[var(--shadow-card)] transition-[transform,background-color] duration-150",
+              "grid min-h-20 place-items-center rounded-2xl shadow-[var(--shadow-card)] transition-[transform,background-color] duration-150",
               up ? "bg-surface text-ink" : "bg-primary text-primary-fg",
               matched.includes(c.id) && "bg-ok text-primary-fg",
             )}
@@ -551,7 +645,7 @@ function ClockBoard({
       <svg
         ref={svgRef}
         viewBox="0 0 200 200"
-        className="mx-auto size-56 max-w-full touch-none"
+        className="mx-auto size-[min(18rem,80vw)] max-w-full touch-none drop-shadow-[0_18px_28px_color-mix(in_oklab,var(--color-ink)_22%,transparent)]"
         onPointerDown={onPtr}
         onPointerMove={onMove}
         onPointerUp={onUp}
@@ -639,8 +733,9 @@ function GridBoard({
   };
   const compact = q.cols >= 8;
   return (
+    <div className="-mx-1 mt-6 overflow-x-auto pb-1 sm:mx-0">
     <div
-      className={cn("mx-auto mt-6 grid w-full max-w-lg", compact ? "gap-0.5 sm:gap-1" : "gap-1.5 sm:gap-2")}
+      className={cn("lumi-tiles mx-auto grid w-full max-w-lg", compact ? "min-w-[22rem] gap-0.5 sm:min-w-0 sm:gap-1" : "gap-1.5 sm:gap-2")}
       style={{ gridTemplateColumns: `repeat(${q.cols}, minmax(0, 1fr))` }}
     >
       {q.cells.map((n) => (
@@ -664,6 +759,7 @@ function GridBoard({
           {n}
         </button>
       ))}
+    </div>
     </div>
   );
 }
@@ -919,7 +1015,7 @@ function OrderBoard({
             type="button"
             disabled={locked}
             onClick={() => place(it.id)}
-            className="min-h-12 rounded-lg bg-primary px-4 text-sm font-medium text-primary-fg shadow-[var(--shadow-card)] active:scale-[0.96]"
+            className="min-h-12 rounded-2xl bg-primary px-4 text-sm font-medium text-primary-fg shadow-[var(--shadow-card)] active:scale-[0.96]"
           >
             {it.label}
           </button>
@@ -970,7 +1066,7 @@ function PathBoard({
   return (
     <div className="mt-6">
       <div
-        className="mx-auto grid w-full max-w-sm gap-1.5 sm:max-w-md sm:gap-2"
+        className="lumi-tiles mx-auto grid w-full max-w-sm gap-1.5 sm:max-w-md sm:gap-2"
         style={{ gridTemplateColumns: `repeat(${q.cols}, minmax(0, 1fr))` }}
       >
         {q.letters.map((ch, i) => {
@@ -983,7 +1079,7 @@ function PathBoard({
               disabled={locked}
               onClick={() => tap(i)}
               className={cn(
-                "grid aspect-square place-items-center rounded-lg font-display text-xl shadow-[var(--shadow-card)] active:scale-[0.96]",
+                "grid aspect-square place-items-center rounded-2xl font-display text-xl shadow-[var(--shadow-card)] active:scale-[0.96]",
                 on ? "bg-primary text-primary-fg" : "bg-surface text-ink",
               )}
             >
@@ -1063,7 +1159,7 @@ function BalanceBoard({
             type="button"
             disabled={locked}
             onClick={() => add(w)}
-            className="grid size-12 place-items-center rounded-lg bg-primary font-display text-lg text-primary-fg shadow-[var(--shadow-card)] active:scale-[0.96]"
+            className="grid size-12 place-items-center rounded-2xl bg-primary font-display text-lg text-primary-fg shadow-[var(--shadow-card)] active:scale-[0.96]"
           >
             {w}
           </button>

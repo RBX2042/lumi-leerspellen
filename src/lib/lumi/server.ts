@@ -254,7 +254,7 @@ export const addChild = createServerFn({ method: "POST" })
       name: z.string().min(1).max(24),
       age: z.number().int().min(4).max(12),
       groupKey: z.enum(["groep1", "groep2", "groep3", "groep4", "groep5", "groep6", "groep7", "groep8"]),
-      avatar: z.enum(["uil", "vos", "beer", "haas", "hert", "egel"]),
+      avatar: z.enum(["uil", "vos", "beer", "haas", "hert", "egel", "ster", "leeuw"]),
     }),
   )
   .handler(async ({ context, data }) => {
@@ -313,7 +313,7 @@ export const updateChild = createServerFn({ method: "POST" })
       dailyMinutes: z.number().int().min(5).max(60).optional(),
       groupKey: z.enum(["groep1", "groep2", "groep3", "groep4", "groep5", "groep6", "groep7", "groep8"]).optional(),
       name: z.string().min(1).max(24).optional(),
-      avatar: z.enum(["uil", "vos", "beer", "haas", "hert", "egel"]).optional(),
+      avatar: z.enum(["uil", "vos", "beer", "haas", "hert", "egel", "ster", "leeuw"]).optional(),
     }),
   )
   .handler(async ({ context, data }) => {

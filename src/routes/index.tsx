@@ -2,31 +2,18 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Clock, Lock, Shield, Users } from "lucide-react";
 import { useEffect } from "react";
 import { Kicker } from "@/components/kicker";
+import { TiltCard } from "@/components/tilt-card";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BRAND, euro, PRICE } from "@/lib/lumi/brand";
-import { dutchGameCount, GAMES, TONE_BAR, TONE_TEXT } from "@/lib/lumi/catalog";
+import { dutchGameCount, GAMES, TONE_BAR, TONE_TEXT, TONE_WASH, gameArt } from "@/lib/lumi/catalog";
 import { PLANS } from "@/lib/lumi/pricing";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: Home });
-
-const TONE_WASH: Record<string, string> = {
-  rekenen: "from-tone-rekenen/18",
-  taal: "from-tone-taal/18",
-  denken: "from-tone-denken/18",
-  wereld: "from-tone-wereld/18",
-};
-
-const TONE_ART: Record<string, string> = {
-  rekenen: "/art/tone-rekenen.jpg",
-  taal: "/art/tone-taal.jpg",
-  denken: "/art/tone-denken.jpg",
-  wereld: "/art/tone-wereld.jpg",
-};
 
 function Home() {
   useEffect(() => {
@@ -48,30 +35,33 @@ function Home() {
             alt=""
             className="pointer-events-none absolute -right-16 top-8 hidden h-64 w-auto opacity-[0.14] lg:block"
             width={200}
-            height={298}
+            height={300}
           />
           <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-10 md:grid-cols-[1.05fr_0.95fr] md:gap-12 md:pb-24 md:pt-16 lg:gap-16 lg:pb-28 lg:pt-20">
             <div className="lumi-rise">
-              <Badge>{BRAND.category} · 4–12 jaar</Badge>
+              <Badge>
+                {BRAND.category} · 4–12 jaar
+              </Badge>
               <h1 className="mt-6 font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl lg:text-6xl">
-                Schermtijd waar een kind{" "}
-                <em className="font-medium italic text-clay">écht</em> van leert.
+                Niet nappraten.
+                <br />
+                <em className="font-medium italic text-clay">Vooruitdenken.</em>
               </h1>
               <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
-                {dutchGameCount(true)} korte leerspellen, afgestemd op groep 1 tot 8. Jij ziet de
-                voortgang. Zij spelen — tikken, slepen, omdraaien. Geen reclame, geen lootboxes, geen
-                eindeloze feed.
+                {BRAND.tagline}. {dutchGameCount(true)} korte leerspellen voor groep 1 tot 8.
+                Rekenen en taal eerst — plus AI-wijs: checken, duidelijk vragen, jij blijft de
+                baas. Geen chatbot, geen reclame, geen eindeloze feed.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Button size="lg" asChild>
+                <Button size="lg" className="w-full sm:w-auto" asChild>
                   <Link to="/login" search={{ next: "/ouders" }}>
                     Start 7 dagen gratis
                     <ArrowRight />
                   </Link>
                 </Button>
-                <Button size="lg" variant="secondary" asChild>
-                  <Link to="/" hash="spellen">
-                    Bekijk de spellen
+                <Button size="lg" variant="secondary" className="w-full sm:w-auto" asChild>
+                  <Link to="/huiswerk">
+                    Huiswerk vanavond
                   </Link>
                 </Button>
               </div>
@@ -120,6 +110,47 @@ function Home() {
           </div>
         </section>
 
+        <section id="aiwijs" className="relative overflow-hidden border-b border-border">
+          <img
+            src="/art/tone-ai.jpg"
+            alt=""
+            className="pointer-events-none absolute inset-0 size-full object-cover opacity-25"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-bg/70 via-bg/88 to-bg" />
+          <div className="relative mx-auto max-w-6xl px-4 py-24">
+            <Kicker>Daarom anders</Kicker>
+            <h2 className="mt-3 max-w-2xl font-display text-3xl font-medium sm:text-4xl">
+              AI-wijs vóór de rest van de klas.
+            </h2>
+            <p className="mt-4 max-w-xl text-muted">
+              Geen chatbot voor een kind van acht. Wél de gewoonte die later telt: een
+              duidelijke opdracht geven, checken of het klopt, zelf de baas blijven. Zo is
+              je kind vooruit — niet omdat het napraat, omdat het nadenkt.
+            </p>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {GAMES.filter((g) => g.tone === "ai").map((g) => (
+                <Link key={g.id} to="/proberen/$gameId" params={{ gameId: g.id }} className="block">
+                  <TiltCard className="h-full">
+                  <Card className="lumi-lift h-full overflow-hidden rounded-3xl p-0">
+                    <div className="relative h-36 overflow-hidden">
+                      <img src={gameArt(g.id)} alt="" className="size-full object-cover" />
+                    </div>
+                    <div className="p-5">
+                      <p className={cn("text-xs font-medium uppercase tracking-wider", TONE_TEXT[g.tone])}>
+                        {g.subject}
+                      </p>
+                      <h3 className="mt-2 font-display text-2xl font-medium">{g.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted">{g.blurb}</p>
+                      <p className="mt-4 text-xs text-faint">{g.learns} · Probeer nu</p>
+                    </div>
+                  </Card>
+                  </TiltCard>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section id="spellen" className="mx-auto max-w-6xl scroll-mt-24 px-4 py-24">
           <Kicker>{dutchGameCount(true)} spellen</Kicker>
           <h2 className="mt-3 max-w-2xl font-display text-3xl font-medium sm:text-4xl">
@@ -128,17 +159,22 @@ function Home() {
           <p className="mt-4 max-w-xl text-muted">
             Tikken, slepen, omdraaien, bouwen. Gebouwd op kerndoelen van het
             Nederlandse basisonderwijs — rekenen en taal eerst, plus klok, geld,
-            breuken, zinnen, werkgeheugen en topo.
+            breuken, zinnen, werkgeheugen, topo en AI-wijs.
           </p>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {GAMES.map((g) => (
-              <Card
+              <Link
                 key={g.id}
-                className="lumi-lift group relative flex flex-col overflow-hidden rounded-3xl p-0"
+                to="/proberen/$gameId"
+                params={{ gameId: g.id }}
+                className="block"
               >
-                <div className="relative h-[5.5rem] overflow-hidden">
+              <Card
+                className="lumi-lift group relative flex h-full flex-col overflow-hidden rounded-3xl p-0"
+              >
+                <div className="relative h-32 overflow-hidden">
                   <img
-                    src={TONE_ART[g.tone] ?? TONE_ART.rekenen}
+                    src={gameArt(g.id)}
                     alt=""
                     className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
@@ -155,10 +191,11 @@ function Home() {
                   <h3 className="mt-3 pl-1 font-display text-xl font-medium">{g.title}</h3>
                   <p className="mt-2 flex-1 pl-1 text-sm leading-relaxed text-muted">{g.blurb}</p>
                   <p className="mt-4 pl-1 text-xs text-faint">
-                    {g.ages} · {g.minutes}
+                    {g.ages} · {g.minutes} · Probeer nu
                   </p>
                 </div>
               </Card>
+              </Link>
             ))}
           </div>
         </section>
@@ -170,7 +207,6 @@ function Home() {
             className="pointer-events-none absolute inset-0 size-full object-cover opacity-20"
           />
           <div className="absolute inset-0 bg-ink/80" />
-          <div className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-primary/20 blur-3xl" />
           <div className="relative mx-auto max-w-6xl px-4 py-24">
             <Kicker onInk>Waarom dit, en niet nóg een quiz-app</Kicker>
             <h2 className="mt-3 max-w-2xl font-display text-3xl font-medium sm:text-4xl">
@@ -221,7 +257,7 @@ function Home() {
               </ul>
             </div>
             <div className="relative">
-              <div className="overflow-hidden rounded-[1.9rem] shadow-[var(--shadow-lift)]">
+              <div className="overflow-hidden rounded-3xl shadow-[var(--shadow-lift)]">
                 <img src="/art/ouders-avond.jpg" alt="" className="aspect-[5/4] w-full object-cover" />
               </div>
               <Card className="absolute right-3 bottom-3 left-3 rounded-3xl p-5 sm:left-auto sm:w-80">
@@ -329,7 +365,11 @@ function Home() {
             <img src="/art/ouders-avond.jpg" alt="" className="absolute inset-0 size-full object-cover" />
             <div className="absolute inset-0 bg-ink/72" />
             <div className="relative px-6 py-14 sm:px-14">
-              <img src="/art/owl-square.jpg" alt="" className="mb-5 size-16 rounded-2xl object-cover shadow-[var(--shadow-card)]" />
+              <img
+                src="/art/owl-square.jpg"
+                alt=""
+                className="mb-5 size-16 rounded-2xl object-cover shadow-[var(--shadow-card)]"
+              />
               <Kicker onInk>{BRAND.tagline}</Kicker>
               <h2 className="mt-4 font-display text-3xl font-medium sm:text-4xl">
                 Vanavond nog een ronde tafels. Morgen zie jij of het zat.
@@ -353,7 +393,7 @@ function Home() {
 
 function Fact({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-3xl bg-white/5 p-6 ring-1 ring-white/10 backdrop-blur-sm">
+    <div className="rounded-3xl bg-white/5 p-6 ring-1 ring-white/10">
       <h3 className="font-display text-xl font-medium">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-primary-fg/65">{body}</p>
     </div>
@@ -362,20 +402,27 @@ function Fact({ title, body }: { title: string; body: string }) {
 
 function HeroPanel() {
   return (
-    <div className="relative mx-auto w-full max-w-md lumi-drift">
-      <div className="absolute -right-6 -top-6 size-24 rounded-full bg-primary/15 blur-2xl" />
-      <div className="relative overflow-hidden rounded-[1.9rem] bg-surface shadow-[var(--shadow-lift)] lumi-ring">
-        <img src="/art/hero-table.jpg" alt="Houten tafel met tablet, cijferblokken en een uil." className="aspect-[5/4] w-full object-cover" />
-        <div className="absolute inset-x-3 bottom-3 rounded-[1.15rem] bg-surface/92 p-3 shadow-[var(--shadow-card)] backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <img src="/art/owl-square.jpg" alt="" className="size-10 rounded-xl object-cover" width={40} height={40} />
-            <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-faint">Nu spelen</p>
-              <p className="truncate font-display text-base leading-tight">Honderdveld · groep 4</p>
+    <div className="lumi-scene relative mx-auto w-full max-w-md">
+      <div className="lumi-orbit">
+        <TiltCard>
+          <div className="relative overflow-hidden rounded-3xl bg-surface shadow-[var(--shadow-lift)] lumi-ring">
+            <img
+              src="/art/hero-table.jpg"
+              alt="Houten tafel met tablet, cijferblokken en een uil."
+              className="aspect-[5/4] w-full object-cover"
+            />
+            <div className="absolute inset-x-3 bottom-3 rounded-[1.15rem] bg-surface/92 p-3 shadow-[var(--shadow-card)] backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <img src="/art/owl-square.jpg" alt="" className="size-10 rounded-xl object-cover" width={40} height={40} />
+                <div className="min-w-0">
+                  <p className="text-xs uppercase tracking-[0.16em] text-faint">Nu spelen</p>
+                  <p className="truncate font-display text-base leading-tight">Honderdveld · groep 4</p>
+                </div>
+                <p className="ml-auto text-xs tabular-nums text-muted">3 op rij</p>
+              </div>
             </div>
-            <p className="ml-auto text-xs tabular-nums text-muted">3 op rij</p>
           </div>
-        </div>
+        </TiltCard>
       </div>
     </div>
   );

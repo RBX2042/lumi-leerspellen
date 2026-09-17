@@ -14,6 +14,7 @@ import { Route as SplatRouteImport } from './routes/$'
 import { Route as AfrekenenRouteImport } from './routes/afrekenen'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as GroeiRouteImport } from './routes/groei'
+import { Route as HuiswerkRouteImport } from './routes/huiswerk'
 import { Route as HulpRouteImport } from './routes/hulp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MerkRouteImport } from './routes/merk'
@@ -24,6 +25,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SchoolRouteImport } from './routes/school'
 import { Route as SpelenRouteImport } from './routes/spelen'
 import { Route as VoorwaardenRouteImport } from './routes/voorwaarden'
+import { Route as ProberenGameIdRouteImport } from './routes/proberen.$gameId'
 import { Route as SpelenIndexRouteImport } from './routes/spelen.index'
 import { Route as SpelenGameIdRouteImport } from './routes/spelen.$gameId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -51,6 +53,11 @@ const CookiesRoute = CookiesRouteImport.update({
 const GroeiRoute = GroeiRouteImport.update({
   id: '/groei',
   path: '/groei',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HuiswerkRoute = HuiswerkRouteImport.update({
+  id: '/huiswerk',
+  path: '/huiswerk',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HulpRoute = HulpRouteImport.update({
@@ -103,6 +110,11 @@ const VoorwaardenRoute = VoorwaardenRouteImport.update({
   path: '/voorwaarden',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProberenGameIdRoute = ProberenGameIdRouteImport.update({
+  id: '/proberen/$gameId',
+  path: '/proberen/$gameId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SpelenIndexRoute = SpelenIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -125,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/afrekenen': typeof AfrekenenRoute
   '/cookies': typeof CookiesRoute
   '/groei': typeof GroeiRoute
+  '/huiswerk': typeof HuiswerkRoute
   '/hulp': typeof HulpRoute
   '/login': typeof LoginRoute
   '/merk': typeof MerkRoute
@@ -135,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/school': typeof SchoolRoute
   '/spelen': typeof SpelenRouteWithChildren
   '/voorwaarden': typeof VoorwaardenRoute
+  '/proberen/$gameId': typeof ProberenGameIdRoute
   '/spelen/$gameId': typeof SpelenGameIdRoute
   '/spelen/': typeof SpelenIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -145,6 +159,7 @@ export interface FileRoutesByTo {
   '/afrekenen': typeof AfrekenenRoute
   '/cookies': typeof CookiesRoute
   '/groei': typeof GroeiRoute
+  '/huiswerk': typeof HuiswerkRoute
   '/hulp': typeof HulpRoute
   '/login': typeof LoginRoute
   '/merk': typeof MerkRoute
@@ -154,6 +169,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/school': typeof SchoolRoute
   '/voorwaarden': typeof VoorwaardenRoute
+  '/proberen/$gameId': typeof ProberenGameIdRoute
   '/spelen/$gameId': typeof SpelenGameIdRoute
   '/spelen': typeof SpelenIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -165,6 +181,7 @@ export interface FileRoutesById {
   '/afrekenen': typeof AfrekenenRoute
   '/cookies': typeof CookiesRoute
   '/groei': typeof GroeiRoute
+  '/huiswerk': typeof HuiswerkRoute
   '/hulp': typeof HulpRoute
   '/login': typeof LoginRoute
   '/merk': typeof MerkRoute
@@ -175,6 +192,7 @@ export interface FileRoutesById {
   '/school': typeof SchoolRoute
   '/spelen': typeof SpelenRouteWithChildren
   '/voorwaarden': typeof VoorwaardenRoute
+  '/proberen/$gameId': typeof ProberenGameIdRoute
   '/spelen/$gameId': typeof SpelenGameIdRoute
   '/spelen/': typeof SpelenIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -187,6 +205,7 @@ export interface FileRouteTypes {
     | '/afrekenen'
     | '/cookies'
     | '/groei'
+    | '/huiswerk'
     | '/hulp'
     | '/login'
     | '/merk'
@@ -197,6 +216,7 @@ export interface FileRouteTypes {
     | '/school'
     | '/spelen'
     | '/voorwaarden'
+    | '/proberen/$gameId'
     | '/spelen/$gameId'
     | '/spelen/'
     | '/api/auth/$'
@@ -207,6 +227,7 @@ export interface FileRouteTypes {
     | '/afrekenen'
     | '/cookies'
     | '/groei'
+    | '/huiswerk'
     | '/hulp'
     | '/login'
     | '/merk'
@@ -216,6 +237,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/school'
     | '/voorwaarden'
+    | '/proberen/$gameId'
     | '/spelen/$gameId'
     | '/spelen'
     | '/api/auth/$'
@@ -226,6 +248,7 @@ export interface FileRouteTypes {
     | '/afrekenen'
     | '/cookies'
     | '/groei'
+    | '/huiswerk'
     | '/hulp'
     | '/login'
     | '/merk'
@@ -236,6 +259,7 @@ export interface FileRouteTypes {
     | '/school'
     | '/spelen'
     | '/voorwaarden'
+    | '/proberen/$gameId'
     | '/spelen/$gameId'
     | '/spelen/'
     | '/api/auth/$'
@@ -247,6 +271,7 @@ export interface RootRouteChildren {
   AfrekenenRoute: typeof AfrekenenRoute
   CookiesRoute: typeof CookiesRoute
   GroeiRoute: typeof GroeiRoute
+  HuiswerkRoute: typeof HuiswerkRoute
   HulpRoute: typeof HulpRoute
   LoginRoute: typeof LoginRoute
   MerkRoute: typeof MerkRoute
@@ -257,6 +282,7 @@ export interface RootRouteChildren {
   SchoolRoute: typeof SchoolRoute
   SpelenRoute: typeof SpelenRouteWithChildren
   VoorwaardenRoute: typeof VoorwaardenRoute
+  ProberenGameIdRoute: typeof ProberenGameIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -295,6 +321,13 @@ declare module '@tanstack/react-router' {
       path: '/groei'
       fullPath: '/groei'
       preLoaderRoute: typeof GroeiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/huiswerk': {
+      id: '/huiswerk'
+      path: '/huiswerk'
+      fullPath: '/huiswerk'
+      preLoaderRoute: typeof HuiswerkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hulp': {
@@ -367,6 +400,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VoorwaardenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/proberen/$gameId': {
+      id: '/proberen/$gameId'
+      path: '/proberen/$gameId'
+      fullPath: '/proberen/$gameId'
+      preLoaderRoute: typeof ProberenGameIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/spelen/': {
       id: '/spelen/'
       path: '/'
@@ -410,6 +450,7 @@ const rootRouteChildren: RootRouteChildren = {
   AfrekenenRoute: AfrekenenRoute,
   CookiesRoute: CookiesRoute,
   GroeiRoute: GroeiRoute,
+  HuiswerkRoute: HuiswerkRoute,
   HulpRoute: HulpRoute,
   LoginRoute: LoginRoute,
   MerkRoute: MerkRoute,
@@ -420,6 +461,7 @@ const rootRouteChildren: RootRouteChildren = {
   SchoolRoute: SchoolRoute,
   SpelenRoute: SpelenRouteWithChildren,
   VoorwaardenRoute: VoorwaardenRoute,
+  ProberenGameIdRoute: ProberenGameIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

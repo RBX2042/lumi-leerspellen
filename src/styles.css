@@ -115,6 +115,24 @@
     backdrop-filter: blur(18px) saturate(1.2);
     -webkit-backdrop-filter: blur(18px) saturate(1.2);
   }
+  .lumi-scene { perspective: 1100px; }
+  .lumi-card3d {
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0);
+    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+  .lumi-block {
+    box-shadow:
+      0 1px 0 color-mix(in oklab, var(--color-ink) 10%, transparent),
+      0 12px 20px -14px color-mix(in oklab, var(--color-ink) 30%, transparent),
+      inset 0 1px 0 color-mix(in oklab, #fff 72%, transparent);
+    transform: translateZ(0);
+    transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms ease;
+  }
+  .lumi-block:active:not(:disabled) {
+    transform: translateY(2px) scale(0.97);
+  }
 }
 
 @keyframes lumi-pop { 0% { transform: scale(1); } 40% { transform: scale(1.03); } 100% { transform: scale(1); } }
@@ -173,6 +191,40 @@
 .lumi-pop-out { animation: lumi-pop-out 180ms ease-in forwards; pointer-events: none; }
 .lumi-pip { transition: background-color 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1); }
 .lumi-pip-on { transform: scaleY(1.4); }
+
+.lumi-tiles > * {
+  animation: lumi-rise 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.lumi-tiles > *:nth-child(1) { animation-delay: 0ms; }
+.lumi-tiles > *:nth-child(2) { animation-delay: 40ms; }
+.lumi-tiles > *:nth-child(3) { animation-delay: 80ms; }
+.lumi-tiles > *:nth-child(4) { animation-delay: 120ms; }
+.lumi-tiles > *:nth-child(5) { animation-delay: 160ms; }
+.lumi-tiles > *:nth-child(6) { animation-delay: 200ms; }
+.lumi-tiles > *:nth-child(7) { animation-delay: 240ms; }
+.lumi-tiles > *:nth-child(8) { animation-delay: 280ms; }
+
+@keyframes lumi-orbit {
+  0%, 100% { transform: rotateX(5deg) rotateY(-9deg) translate3d(0, 0, 12px); }
+  50% { transform: rotateX(2deg) rotateY(8deg) translate3d(0, -10px, 18px); }
+}
+.lumi-orbit {
+  transform-style: preserve-3d;
+  animation: lumi-orbit 8s ease-in-out infinite;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lumi-lift:hover { transform: translateY(-6px) rotateX(3deg) scale(1.012); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .lumi-orbit, .lumi-drift, .lumi-card3d { transform: none !important; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

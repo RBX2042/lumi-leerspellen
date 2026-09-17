@@ -33,6 +33,11 @@ const interactive: GameId[] = [
   "weeg",
   "spiegel",
   "zin",
+  "regen",
+  "ballon",
+  "sprint",
+  "vraagbaas",
+  "letterbos",
 ];
 
 describe("interactive games", () => {
@@ -146,5 +151,20 @@ describe("catalog", () => {
       [...GAME_ID_LIST],
     );
     assert.deepEqual(ALL_GAMES, [...GAME_ID_LIST]);
+  });
+});
+
+describe("huiswerk curriculum", () => {
+  it("ships theory and a mixed question per groep", async () => {
+    const { CURRICULUM, homeworkGames } = await import("./curriculum.ts");
+    for (const plan of Object.values(CURRICULUM)) {
+      assert.ok(plan.games.length >= 4, plan.key);
+      assert.ok(plan.theory.mix.rule.length > 12);
+      const games = homeworkGames(plan.key, "mix");
+      assert.ok(games.length >= 4);
+      const q = makeQuestion("huiswerk", plan.key, 4, "core");
+      assert.ok(q.teach && q.teach.length > 8, `${plan.key} huiswerk teach`);
+      assert.ok(q.hint && q.hint.length > 8, `${plan.key} huiswerk hint`);
+    }
   });
 });

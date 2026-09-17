@@ -20,62 +20,60 @@ function School() {
   return (
     <div className="min-h-dvh">
       <SiteHeader />
-      <main>
-        <section className="relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 lumi-wash" />
-          <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-16">
-            <Kicker>Voor de klas</Kicker>
-            <h1 className="mt-3 font-display text-4xl font-medium tracking-tight sm:text-5xl">
-              Eén klas. Alle spellen. {euro(PRICE.school)} per maand.
-            </h1>
-            <p className="mt-4 max-w-2xl text-lg text-muted">
-              {BRAND.name} voor groep 1 tot 8. Tot 30 leerlingen, geen reclame, voortgang per
-              kind. Ouders oefenen thuis door — dat is hoe een klas ook gezinnen meeneemt.
-            </p>
-          </div>
-        </section>
+      <main className="mx-auto max-w-5xl px-4 py-16">
+        <div className="mb-10 overflow-hidden rounded-3xl shadow-[var(--shadow-card)]">
+          <img src="/art/tone-wereld.jpg" alt="" className="h-44 w-full object-cover sm:h-56" />
+        </div>
+        <Kicker>Voor de klas</Kicker>
+        <h1 className="mt-3 font-display text-4xl font-medium tracking-tight sm:text-5xl">
+          {BRAND.slogan}
+        </h1>
+        <p className="mt-4 max-w-2xl text-lg text-muted">
+          {BRAND.name} voor groep 1 tot 8. Tot 30 leerlingen, geen reclame, geen chatbot,
+          voortgang per kind. {BRAND.line} Ouders oefenen thuis door.
+        </p>
 
-        <div className="mx-auto max-w-5xl px-4 pb-16">
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              ["Tot 30 profielen", "Elk kind eigen groep en niveau."],
-              ["Kerndoelen NL", "Tafels, spelling, breuken, klok, topo."],
-              ["Thuislink", "Ouders zetten hetzelfde pad voort."],
-            ].map(([t, b]) => (
-              <Card key={t} className="lumi-lift rounded-3xl p-6">
-                <p className="font-display text-xl">{t}</p>
-                <p className="mt-2 text-sm text-muted">{b}</p>
-              </Card>
-            ))}
-          </div>
+        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          {[
+            ["Tot 30 profielen", "Elk kind eigen groep en niveau."],
+            ["Huiswerk per groep", "Eerst de regel, dan spelen. Zoals de klas die morgen krijgt."],
+            ["Thuislink", "Ouders zetten hetzelfde pad voort."],
+          ].map(([t, b]) => (
+            <Card key={t} className="rounded-xl p-5">
+              <p className="font-display text-xl">{t}</p>
+              <p className="mt-2 text-sm text-muted">{b}</p>
+            </Card>
+          ))}
+        </div>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            {user ? (
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          {user ? (
+            <>
               <Button size="lg" asChild>
                 <Link to="/afrekenen" search={{ plan: "school" }}>
                   Activeer School
                 </Link>
               </Button>
-            ) : (
-              <Button size="lg" asChild>
-                <Link to="/login" search={{ next: "/afrekenen?plan=school" }}>
-                  7 dagen klasproef
-                </Link>
-              </Button>
-            )}
-          </div>
-          <p className="mt-3 text-sm text-faint">Of {euro(PRICE.schoolYear)} per jaar — twee maanden cadeau.</p>
+            </>
+          ) : (
+            <Button size="lg" asChild>
+              <Link to="/login" search={{ next: "/afrekenen?plan=school" }}>
+                7 dagen klasproef
+              </Link>
+            </Button>
+          )}
+        </div>
+        <p className="mt-3 text-sm text-faint">Of {euro(PRICE.schoolYear)} per jaar — twee maanden cadeau.</p>
 
-          <h2 className="mt-16 font-display text-2xl">Vraag een klasproef aan</h2>
-          <p className="mt-2 max-w-xl text-sm text-muted">
-            Schoolnaam is genoeg. We zetten je account klaar voor tot 30 leerlingen.
-          </p>
-          <SchoolForm signedIn={!!user} />
+        <h2 className="mt-16 font-display text-2xl">Vraag een klasproef aan</h2>
+        <p className="mt-2 max-w-xl text-sm text-muted">
+          Schoolnaam is genoeg. We zetten je account klaar voor tot 30 leerlingen.
+        </p>
+        <SchoolForm signedIn={!!user} />
 
-          <h2 className="mt-16 font-display text-2xl">Stuur dit naar een juf</h2>
-          <div className="mt-4 grid gap-4">
-            <TeacherCopies />
-          </div>
+        <h2 className="mt-16 font-display text-2xl">Stuur dit naar een juf</h2>
+        <div className="mt-4 grid gap-4">
+          <TeacherCopies />
         </div>
       </main>
       <SiteFooter />
@@ -92,7 +90,7 @@ function SchoolForm({ signedIn }: { signedIn: boolean }) {
 
   if (!signedIn) {
     return (
-      <Card className="mt-4 rounded-3xl p-6">
+      <Card className="mt-4 rounded-xl p-5">
         <p className="text-sm text-muted">Log in als leerkracht om een klasproef vast te leggen.</p>
         <Button className="mt-4" asChild>
           <Link to="/login" search={{ next: "/school" }}>
@@ -123,7 +121,7 @@ function SchoolForm({ signedIn }: { signedIn: boolean }) {
   }
 
   return (
-    <Card className="mt-4 rounded-3xl p-6">
+    <Card className="mt-4 rounded-xl p-5">
       <form className="grid gap-4 sm:grid-cols-2" onSubmit={onSubmit}>
         <div className="grid gap-1.5 sm:col-span-2">
           <Label htmlFor="school">School</Label>
@@ -133,7 +131,7 @@ function SchoolForm({ signedIn }: { signedIn: boolean }) {
           <Label htmlFor="groep">Groep</Label>
           <select
             id="groep"
-            className="h-11 rounded-full border border-border bg-surface px-3"
+            className="h-11 rounded-md border border-border bg-surface px-3"
             value={groep}
             onChange={(e) => setGroep(e.target.value)}
           >
@@ -151,7 +149,7 @@ function SchoolForm({ signedIn }: { signedIn: boolean }) {
             maxLength={400}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="min-h-24 rounded-2xl border border-border bg-surface px-3 py-2 text-sm"
+            className="min-h-24 rounded-md border border-border bg-surface px-3 py-2 text-sm"
           />
         </div>
         {msg ? <p className="text-sm text-ok sm:col-span-2">{msg}</p> : null}

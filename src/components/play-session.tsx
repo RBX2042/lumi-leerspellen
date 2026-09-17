@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Volume2, VolumeX } from "lucide-react";
-import { PlayBoard, answerLabel, isPlayBoard } from "@/components/play-boards";
-import { BadgeMark, ComboHud, Confetti, XpBar, XpPops } from "@/components/habit-bits";
+import { PlayBoard, answerLabel, isPlayBoard } from "@/components/play-root";
+import { BadgeMark, ComboHud, Confetti, RoundStars, XpBar, XpPops } from "@/components/habit-bits";
 import { Kicker } from "@/components/kicker";
 import { GameVisual, MemoryBoard } from "@/components/game-visuals";
-import { LumiMark } from "@/components/lumi-mark";
 import { ParentLink } from "@/components/parent-gate";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,13 +37,14 @@ import {
   tapHaptic,
   unlockAudio,
 } from "@/lib/lumi/audio";
-import { gameById } from "@/lib/lumi/catalog";
+import { gameById, gameArt } from "@/lib/lumi/catalog";
 import {
-  BADGE_BY_ID,
   badgesFromProgress,
+  badgeTitle,
   continueHook,
   levelFromXp,
   loadHabit,
+  loadWorld,
   newBadges,
   reducedMotion,
   roundXp,
@@ -58,6 +58,7 @@ import {
 import { makeQuestion, nextLevel, reshuffle } from "@/lib/lumi/questions";
 import { recordSession } from "@/lib/lumi/server";
 import { starsFromCorrect } from "@/lib/lumi/path";
+import { levelTitle } from "@/lib/lumi/rewards";
 import type { Beat, Child, ChildProgress, GameId, Question, Skill } from "@/lib/lumi/types";
 import { cn } from "@/lib/utils";
 
@@ -83,6 +84,7 @@ export function PlaySession({
   skills,
   minutesLeft = 20,
   playsLeft = null,
+  guest = false,
 }: {
   gameId: string;
   child: Child;
@@ -93,6 +95,7 @@ export function PlaySession({
   skills?: Skill[];
   minutesLeft?: number;
   playsLeft?: number | null;
+  guest?: boolean;
 }) {
   const gid = gameId as GameId;
   const isMemory = gid === "geheugen";
@@ -278,7 +281,19 @@ export function PlaySession({
       days,
     };
     const beforeBadges = badgesFromProgress(progress, skills, { bestCombo: habit.bestCombo });
-    const afterBadges = badgesFromProgress(nextProgress, skills, {
+    const nextSkills = [
+      ...(skills ?? []).filter((s) => s.gameId !== gid),
+      {
+        gameId: gid,
+        level: lvl,
+        mastery: Math.round((c / Math.max(1, a)) * 100),
+        correct: c,
+        attempts: a,
+        streak: combo,
+        bestStreak: best,
+      },
+    ];
+    const afterBadges = badgesFromProgress(nextProgress, nextSkills, {
       bestCombo: best,
       threeStars: stars >= 3 || (progress?.perfects ?? 0) > 0,
     });
@@ -291,18 +306,20 @@ export function PlaySession({
     });
     const durationSec = Math.max(1, Math.round((Date.now() - started.current) / 1000));
     try {
-      await recordSession({
-        data: {
-          childId: child.id,
-          gameId: gid,
-          correct: c,
-          attempts: a,
-          score: c * 10,
-          xp,
-          durationSec,
-          level: lvl,
-        },
-      });
+      if (!guest) {
+        await recordSession({
+          data: {
+            childId: child.id,
+            gameId: gid,
+            correct: c,
+            attempts: a,
+            score: c * 10,
+            xp,
+            durationSec,
+            level: lvl,
+          },
+        });
+      }
     } catch {
       /* still show results */
     } finally {
@@ -476,7 +493,8 @@ export function PlaySession({
   const pct = Math.round((index / ROUND) * 100);
   const nextMeta = nextGameId ? gameById(nextGameId) : undefined;
   const combo = comboLine(winStreak);
-  const brief = briefing(gid, startLevel, child.name, priorTags);
+  const brief = briefing(gid, startLevel, child.name, priorTags, child.groupKey);
+  const world = loadWorld(child.id, child.avatar);
   const pickedLabel = pickedText ?? (q.kind === "choice" && picked != null ? q.choices[picked] : undefined);
   const correctLabel = answerLabel(q);
   const showHint = hintOpen && !!q.hint && phase === "ask" && (!isMemory || memPhase === "play");
@@ -489,29 +507,39 @@ export function PlaySession({
 
   if (phase === "brief" && !done) {
     return (
-      <div className="mx-auto flex min-h-[100dvh] w-full max-w-lg flex-col items-center justify-center px-4 py-10 text-center sm:max-w-xl">
-        <LumiMark className="size-16" />
-        <Kicker className="mt-6">{brief.kicker}</Kicker>
-        <h1 className="mt-3 font-display text-4xl font-medium">{brief.title}</h1>
-        <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">{brief.body}</p>
-        <p className="mt-4 max-w-sm rounded-2xl bg-surface px-4 py-3 text-sm text-ink shadow-[var(--shadow-card)]">
-          {brief.tip}
-        </p>
-        <Button
-          className="mt-8"
-          size="lg"
-          onClick={() => {
-            unlockAudio();
-            playTap();
-            started.current = Date.now();
-            setPhase("ask");
-          }}
-        >
-          Start
-        </Button>
-        <Link to="/spelen" className="mt-4 text-sm text-muted hover:text-ink">
-          Terug
-        </Link>
+      <div className="relative mx-auto flex min-h-[100dvh] w-full max-w-lg flex-col items-center justify-center overflow-hidden px-4 py-10 text-center sm:max-w-xl">
+        <img
+          src={gameArt(gid)}
+          alt=""
+          className="pointer-events-none absolute inset-0 size-full object-cover opacity-30"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-bg/40 via-bg/80 to-bg" />
+        <div className="relative">
+          <img src={gameArt(gid)} alt="" className="mx-auto h-36 w-56 rounded-3xl object-cover shadow-[var(--shadow-lift)] lumi-ring" />
+          <Kicker className="mt-6">{brief.kicker}</Kicker>
+          <h1 className="mt-3 font-display text-4xl font-medium">{brief.title}</h1>
+          <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">{brief.body}</p>
+          <div className="mt-4 max-w-sm rounded-2xl bg-surface px-4 py-3 text-left shadow-[var(--shadow-card)]">
+            <p className="text-xs font-medium uppercase tracking-wider text-faint">De regel</p>
+            <p className="mt-1 text-sm text-ink">{brief.theory}</p>
+            <p className="mt-2 text-sm text-muted">{brief.tip}</p>
+          </div>
+          <Button
+            className="mt-8"
+            size="lg"
+            onClick={() => {
+              unlockAudio();
+              playTap();
+              started.current = Date.now();
+              setPhase("ask");
+            }}
+          >
+            Start
+          </Button>
+          <Link to={guest ? "/" : "/spelen"} className="mt-4 block text-sm text-muted hover:text-ink">
+            Terug
+          </Link>
+        </div>
       </div>
     );
   }
@@ -528,27 +556,18 @@ export function PlaySession({
     return (
       <div className="relative mx-auto flex min-h-[70dvh] w-full max-w-lg flex-col items-center justify-center px-4 py-10 text-center sm:max-w-xl">
         <Confetti on={stars >= 2 || leveledTo != null} />
-        <Kicker>{leveledTo ? `Niveau ${leveledTo}` : "Klaar"}</Kicker>
+        <Kicker>{leveledTo ? levelTitle(leveledTo, world) : "Klaar"}</Kicker>
         <h1 className="mt-3 font-display text-4xl font-medium">
           {leveledTo ? `${child.name}, je groeit` : `Goed bezig, ${child.name}`}
         </h1>
         <p className="mt-3 text-muted">
           {correct} van {attempts} goed · +{gained} XP
         </p>
-        <div className="mt-6 flex gap-2" aria-label={`${stars} van 3 sterren`}>
-          {Array.from({ length: 3 }, (_, i) => (
-            <span
-              key={i}
-              className={cn(
-                "size-10 rounded-full",
-                i < stars ? "lumi-star-in bg-primary" : "bg-surface-2",
-              )}
-              style={{ animationDelay: `${i * 120}ms` }}
-            />
-          ))}
+        <div className="mt-6">
+          <RoundStars n={stars} world={world} />
         </div>
         <div className="mt-6 w-full max-w-sm text-left">
-          <XpBar info={info} />
+          <XpBar info={info} world={world} />
         </div>
         {unlocked.length > 0 ? (
           <div className="mt-5">
@@ -556,8 +575,8 @@ export function PlaySession({
             <div className="mt-2 flex flex-wrap justify-center gap-3">
               {unlocked.map((id) => (
                 <span key={id} className="lumi-burst inline-flex flex-col items-center gap-1">
-                  <BadgeMark id={id} />
-                  <span className="text-xs">{BADGE_BY_ID[id].title}</span>
+                  <BadgeMark id={id} world={world} />
+                  <span className="text-xs">{badgeTitle(id, world)}</span>
                 </span>
               ))}
             </div>
@@ -583,7 +602,7 @@ export function PlaySession({
               Nog een ronde{count != null ? ` · ${count}` : ""}
             </Button>
           ) : null}
-          {nextMeta ? (
+          {nextMeta && !guest ? (
             <Button variant={canMore ? "secondary" : "default"} asChild>
               <Link to="/spelen/$gameId" params={{ gameId: nextMeta.id }} search={{ kind: child.id }}>
                 Volgende: {nextMeta.title}
@@ -591,7 +610,7 @@ export function PlaySession({
             </Button>
           ) : (
             <Button variant={canMore ? "secondary" : "default"} asChild>
-              <Link to="/spelen">Naar de spellen</Link>
+              <Link to={guest ? "/" : "/spelen"}>{guest ? "Alle spellen" : "Naar de spellen"}</Link>
             </Button>
           )}
           <div className="flex items-center justify-center gap-4">
@@ -604,6 +623,7 @@ export function PlaySession({
                 Niet automatisch
               </button>
             ) : null}
+            {guest ? null : (
             <ParentLink
               to="/ouders"
               hasPin={hasPin}
@@ -611,6 +631,7 @@ export function PlaySession({
             >
               Naar ouderzone
             </ParentLink>
+            )}
           </div>
         </div>
         {saving ? <p className="mt-4 text-xs text-faint">Voortgang opslaan…</p> : null}
@@ -626,9 +647,15 @@ export function PlaySession({
         juice === "shake" && "lumi-shake",
       )}
     >
+      <img
+        src={gameArt(gid)}
+        alt=""
+        className="pointer-events-none absolute inset-x-0 top-0 h-40 w-full object-cover opacity-25"
+      />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-transparent to-bg" />
       <XpPops items={pops} />
-      <div className="mb-3 flex items-center gap-2">
-        <Link to="/spelen" className="inline-flex h-11 shrink-0 items-center text-sm text-muted hover:text-ink">
+      <div className="relative mb-3 flex items-center gap-2">
+        <Link to={guest ? "/" : "/spelen"} className="inline-flex h-11 shrink-0 items-center text-sm text-muted hover:text-ink">
           Terug
         </Link>
         <p className="min-w-0 flex-1 truncate text-center text-sm font-medium text-ink">{meta.title}</p>
@@ -711,7 +738,7 @@ export function PlaySession({
               <>
                 <GameVisual visual={q.visual} reveal={phase === "feedback"} scaffold={showHint} />
                 {q.kind === "choice" ? (
-                  <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lumi-tiles">
                     {q.choices.map((c, i) => {
                       const show = picked != null;
                       const isAns = i === q.answer;
@@ -722,7 +749,7 @@ export function PlaySession({
                           type="button"
                           onClick={() => onChoice(i)}
                           className={cn(
-                            "min-h-14 rounded-lg px-4 py-3 text-left text-lg font-medium shadow-[var(--shadow-card)] transition-[transform,background-color] duration-150 active:scale-[0.98]",
+                            "lumi-block min-h-14 rounded-2xl px-4 py-3 text-left text-lg font-medium transition-[transform,background-color] duration-150",
                             !show && "bg-surface text-ink hover:bg-surface-2",
                             show && isAns && "bg-ok text-primary-fg",
                             show && isPick && !isAns && "bg-danger text-primary-fg",
