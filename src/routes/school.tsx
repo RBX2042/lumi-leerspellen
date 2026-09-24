@@ -58,7 +58,7 @@ function School() {
           ) : (
             <Button size="lg" asChild>
               <Link to="/login" search={{ next: "/afrekenen?plan=school" }}>
-                7 dagen klasproef
+                30 dagen klasproef
               </Link>
             </Button>
           )}

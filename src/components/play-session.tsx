@@ -62,7 +62,8 @@ import { levelTitle } from "@/lib/lumi/rewards";
 import type { Beat, Child, ChildProgress, GameId, Question, Skill } from "@/lib/lumi/types";
 import { cn } from "@/lib/utils";
 
-const ROUND = 10;
+const FREE_ROUND = 10;
+const PLUS_ROUND = 12;
 const NEXT_SEC = 8;
 
 function newMemorySeq(len: number, size: number): number[] {
@@ -85,6 +86,7 @@ export function PlaySession({
   minutesLeft = 20,
   playsLeft = null,
   guest = false,
+  plusMode = false,
 }: {
   gameId: string;
   child: Child;
@@ -96,7 +98,9 @@ export function PlaySession({
   minutesLeft?: number;
   playsLeft?: number | null;
   guest?: boolean;
+  plusMode?: boolean;
 }) {
+  const ROUND = plusMode ? PLUS_ROUND : FREE_ROUND;
   const gid = gameId as GameId;
   const isMemory = gid === "geheugen";
   const meta = gameById(gameId);

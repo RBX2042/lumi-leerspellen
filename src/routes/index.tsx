@@ -55,7 +55,7 @@ function Home() {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button size="lg" className="w-full sm:w-auto" asChild>
                   <Link to="/login" search={{ next: "/ouders" }}>
-                    Start 7 dagen gratis
+                    Start 30 dagen gratis
                     <ArrowRight />
                   </Link>
                 </Button>

@@ -4,6 +4,9 @@ import type { Entitlement, GameId, PlanId, Subscription } from "./types";
 
 export { NEEDED, PRICE, TARGET_MRR };
 
+export const TRIAL_DAYS = 30;
+export const TRIAL_CTA = "30 dagen gratis";
+
 export const PLANS: {
   id: PlanId;
   name: string;
@@ -35,12 +38,13 @@ export const PLANS: {
     priceYear: PRICE.gezinYear,
     tagline: "Tot 4 kinderen. Eén prijs.",
     features: [
+      "30 dagen de hele software op Plus-niveau",
       "Tot 4 kinderen op 1 abonnement",
       `Alle ${GAME_COUNT} leerspellen, onbeperkt`,
       "Ouderinzicht en schermtijd",
       "Opzeggen in één tik, geen addertjes",
     ],
-    cta: "7 dagen gratis",
+    cta: TRIAL_CTA,
     highlight: true,
   },
   {
@@ -51,6 +55,7 @@ export const PLANS: {
     tagline: "Voor wie extra sturing wil",
     features: [
       "Alles van Gezin",
+      "Pro-rondes: langer, lastiger, meer feedback",
       "Wekelijks ouderrapport",
       "Persoonlijk leerpad per kind",
       "Zwakke vaardigheden eerst",
@@ -90,15 +95,17 @@ export function entitlementOf(sub: Subscription | null): Entitlement {
       )
     : null;
 
+  const plusMode = premium;
   return {
     plan,
     premium,
+    plusMode,
     maxChildren: plan === "school" ? 30 : premium ? 4 : 1,
     dailyPlays: premium ? null : 3,
     games: premium ? ALL_GAMES : FREE_GAMES,
     trialDaysLeft,
     label: trialActive
-      ? `Proef · ${trialDaysLeft} dagen`
+      ? `Plus-proef · ${trialDaysLeft} dagen`
       : plan === "gezin"
         ? "Gezin"
         : plan === "plus"

@@ -5,7 +5,7 @@ import { authMiddleware } from "@/lib/auth/middleware";
 import { getSql } from "@/lib/db";
 import { FREE_GAMES, gameById } from "./catalog";
 import { dayKey } from "./day.ts";
-import { entitlementOf } from "./pricing";
+import { entitlementOf, TRIAL_DAYS } from "./pricing";
 import { PRICE, TARGET_MRR } from "./brand";
 import type {
   AvatarId,
@@ -354,8 +354,8 @@ export const startTrial = createServerFn({ method: "POST" })
     const trialActive =
       sub.plan === "trial" && !!sub.trialEndsAt && new Date(sub.trialEndsAt).getTime() > Date.now();
     if (trialActive) return sub;
-    if (sub.trialUsed) throw new Error("De proef van 7 dagen is al gebruikt");
-    const ends = new Date(Date.now() + 7 * 86_400_000).toISOString();
+    if (sub.trialUsed) throw new Error(`De proef van ${TRIAL_DAYS} dagen is al gebruikt`);
+    const ends = new Date(Date.now() + TRIAL_DAYS * 86_400_000).toISOString();
     await sql`update lumi_subscriptions set plan = 'trial', status = 'active', trial_ends_at = ${ends}, trial_used = true where user_id = ${context.userId}`;
     return ensureSub(context.userId);
   });

@@ -123,7 +123,7 @@ function Checkout() {
           </Button>
           {trialAvailable && spec.id !== "school" ? (
             <Button className="mt-2 w-full" variant="secondary" disabled={busy} onClick={() => void trial()}>
-              Eerst 7 dagen proberen
+              Eerst 30 dagen Plus proberen
             </Button>
           ) : null}
           <p className="mt-4 text-xs text-faint">

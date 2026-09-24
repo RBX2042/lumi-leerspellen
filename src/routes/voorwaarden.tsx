@@ -24,7 +24,7 @@ function Voorwaarden() {
       <h2>Abonnement</h2>
       <p>
         Ontdekker is gratis met limieten. Gezin, Plus en School zijn betaalde plannen. Tot iDEAL
-        live is, kun je een plan activeren zonder afschrijving. De proef van 7 dagen is één keer
+        live is, kun je een plan activeren zonder afschrijving. De proef van 30 dagen is één keer
         per account. Opzeggen kan altijd in de ouderzone, in één tik. Na opzeggen val je terug op
         Ontdekker.
       </p>

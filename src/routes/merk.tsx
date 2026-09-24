@@ -206,7 +206,7 @@ function Merk() {
             <li>{BRAND.line}</li>
             <li>Groep 1 tot 8 · geen chatbot · geen reclame</li>
             <li>Gezin {euro(PRICE.gezin)} · School {euro(PRICE.school)} per klas</li>
-            <li>7 dagen gratis</li>
+            <li>30 dagen gratis</li>
           </ul>
           <p className="mt-6 text-sm">Print deze kaart. Hang hem in de teamkamer.</p>
         </section>

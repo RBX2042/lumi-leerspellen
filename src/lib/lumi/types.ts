@@ -103,6 +103,7 @@ export interface DailyUse {
 export interface Entitlement {
   plan: PlanId;
   premium: boolean;
+  plusMode: boolean;
   maxChildren: number;
   dailyPlays: number | null;
   games: GameId[];

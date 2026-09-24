@@ -165,7 +165,7 @@ function Ouderzone({ name }: { name: string }) {
             <ol className="mt-4 grid gap-2 text-sm text-muted">
               <li>1. Kindprofiel — naam, groep, dier.</li>
               <li>2. Oudercode van vier cijfers, zodat een kind niet kan opzeggen.</li>
-              <li>3. {trialAvailable ? "7 dagen alle spellen, of meteen Gezin." : "Kies een plan of speel de drie gratis spellen."}</li>
+              <li>3. {trialAvailable ? "30 dagen alle spellen op Plus, of meteen Gezin." : "Kies een plan of speel de drie gratis spellen."}</li>
             </ol>
           </Card>
         ) : null}
@@ -186,9 +186,9 @@ function Ouderzone({ name }: { name: string }) {
                     <Button
                       size="sm"
                       disabled={busy}
-                      onClick={() => run(() => startTrial(), "Proef van 7 dagen staat aan")}
+                      onClick={() => run(() => startTrial(), "Proef van 30 dagen Plus staat aan")}
                     >
-                      7 dagen gratis
+                      30 dagen gratis
                     </Button>
                   ) : null}
                   <Button size="sm" variant="secondary" asChild>

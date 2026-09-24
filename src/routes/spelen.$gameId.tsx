@@ -111,7 +111,7 @@ function Gate() {
         <div>
           <h1 className="font-display text-3xl">{meta.title} zit in Gezin</h1>
           <p className="mt-3 text-sm text-muted">
-            Start de proef van 7 dagen om alle {dutchGameCount()} spellen open te zetten.
+            Start de proef van 30 dagen om alle {dutchGameCount()} spellen op Plus-niveau open te zetten.
           </p>
           <Button className="mt-6" asChild>
             <Link to="/ouders">Naar ouderzone</Link>
@@ -137,6 +137,7 @@ function Gate() {
       skills={data.skills[child.id]}
       minutesLeft={minutesLeft}
       playsLeft={playsLeft}
+      plusMode={data.entitlement.plusMode}
     />
   );
 }

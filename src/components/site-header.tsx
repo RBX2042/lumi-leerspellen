@@ -77,7 +77,7 @@ export function SiteHeader({ dim = false }: { dim?: boolean }) {
                 className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-primary px-3 text-sm font-medium text-primary-fg shadow-[0_10px_22px_-12px_color-mix(in_oklab,var(--color-primary)_70%,transparent)] sm:px-4"
               >
                 <span className="sm:hidden">Gratis</span>
-                <span className="hidden sm:inline">7 dagen gratis</span>
+                <span className="hidden sm:inline">30 dagen gratis</span>
               </Link>
             </>
           )}
